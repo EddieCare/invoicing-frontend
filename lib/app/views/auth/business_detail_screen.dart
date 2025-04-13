@@ -5,7 +5,7 @@ import '../../../components/Buttons.dart';
 import '../../routes/app_routes.dart';
 import '../../../components/custom_text_field.dart';
 
-class SignupScreen extends StatelessWidget {
+class BusinessDetailScreen extends StatelessWidget {
   final SignupController controller = Get.put(SignupController());
 
   @override
@@ -22,23 +22,27 @@ class SignupScreen extends StatelessWidget {
                 infoSection(context),
                 const SizedBox(height: 20),
                 CustomTextField(
-                  label: "First Name*",
+                  label: "Business Name*",
                   controller: TextEditingController(),
                 ),
                 CustomTextField(
-                  label: "Last Name*",
+                  label: "Address*",
                   controller: TextEditingController(),
                 ),
                 CustomTextField(
-                  label: "Email*",
+                  label: "Phone Number*",
                   controller: TextEditingController(),
                 ),
                 CustomTextField(
-                  label: "Password*",
+                  label: "Business Number*",
                   controller: TextEditingController(),
                   isPassword: true,
                 ),
-                const SizedBox(height: 20),
+                CustomTextField(
+                  label: "Industry",
+                  controller: TextEditingController(),
+                  isPassword: true,
+                ),
               ],
             ),
 
@@ -48,14 +52,12 @@ class SignupScreen extends StatelessWidget {
             // Buttons at the Bottom
             Column(
               children: [
-                PrimaryButton(
-                  text: "Continue",
-                  onPressed: () => Get.toNamed(Routes.businessDetails),
-                ),
+                PrimaryButton(text: "Signup"),
+
                 TextButton(
-                  onPressed: () => Get.toNamed(Routes.login),
+                  onPressed: () => Get.toNamed(Routes.signup),
                   child: const Text(
-                    "Already have an account? Login",
+                    "Go back to Signup",
                     style: TextStyle(color: Colors.black, fontSize: 14),
                   ),
                 ),
@@ -78,7 +80,7 @@ Column infoSection(BuildContext context) {
       SizedBox(height: 20),
       Text(
         // "Atlas Invoice",
-        "Create Account",
+        "Add Business Details",
         style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
       ),
       SizedBox(height: 20),

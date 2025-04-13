@@ -7,20 +7,39 @@ class SplashScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "Invoicing App",
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+    return GetBuilder<SplashController>(
+      init: controller,
+      builder: (controller) {
+        return Scaffold(
+          body: Container(
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color(0xFF1976D2),
+                  Color(0xFF60A5E9),
+                  Color(0xFFA7D3FF),
+                ],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
             ),
-            SizedBox(height: 20),
-            CircularProgressIndicator(), // Show loading indicator
-          ],
-        ),
-      ),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(height: 20),
+                  Image.asset(
+                    "assets/images/splash_item.png",
+                    width: MediaQuery.of(context).size.width * 0.5,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
