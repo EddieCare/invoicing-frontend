@@ -14,7 +14,7 @@ class PrimaryButton extends StatelessWidget {
     this.onPressed,
     // this.icon = Icons.email_outlined,
     this.icon,
-    this.backgroundColor = const Color(0xFF0A2E49),
+    this.backgroundColor = const Color(0xFF000000),
     this.borderRadius = 8.0,
     this.padding = const EdgeInsets.symmetric(vertical: 14, horizontal: 10),
   });

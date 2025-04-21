@@ -19,6 +19,7 @@ class LoginScreen extends StatelessWidget {
             children: [
               Column(
                 children: [
+                  const SizedBox(height: 40),
                   infoSection(context),
                   // Login Form
                   CustomTextField(
@@ -46,7 +47,10 @@ class LoginScreen extends StatelessWidget {
               // Login Button
               Column(
                 children: [
-                  PrimaryButton(),
+                  PrimaryButton(
+                    onPressed: () => Get.toNamed(Routes.baseScreen),
+                    text: "Login",
+                  ),
 
                   // Sign Up Link
                   TextButton(

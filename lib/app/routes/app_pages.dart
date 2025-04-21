@@ -1,7 +1,9 @@
 import 'package:get/get.dart';
 import 'package:invoicing_fe/app/views/auth/auth_main.dart';
+import 'package:invoicing_fe/app/views/profile/edit_profile/edit_profile_screen.dart';
 import '../views/auth/business_detail_screen.dart';
 import '../views/auth/signup_screen.dart';
+import '../views/base/base_screen.dart';
 import '../views/splash_screen.dart';
 import '../views/onboarding_screen.dart';
 import '../views/auth/login_screen.dart';
@@ -16,6 +18,8 @@ class AppPages {
     GetPage(name: Routes.login, page: () => LoginScreen()),
     GetPage(name: Routes.signup, page: () => SignupScreen()),
     GetPage(name: Routes.businessDetails, page: () => BusinessDetailScreen()),
+    GetPage(name: Routes.baseScreen, page: () => BaseScreen()),
     GetPage(name: Routes.dashboard, page: () => DashboardScreen()),
+    GetPage(name: Routes.editProfile, page: () => EditProfileScreen()),
   ];
 }
