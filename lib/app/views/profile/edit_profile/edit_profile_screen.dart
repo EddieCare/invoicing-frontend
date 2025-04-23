@@ -6,8 +6,11 @@ import '../../../../values/values.dart';
 import '../../../controllers/profile/edit_profile/edit_profile_controller.dart';
 import '../../../utils/utilities.dart';
 
-class EditProfileScreen extends GetView<EditProfileController> {
-  const EditProfileScreen({super.key});
+// class EditProfileScreen extends GetView<EditProfileController> {
+class EditProfileScreen extends StatelessWidget {
+  EditProfileScreen({super.key});
+
+  final EditProfileController controller = Get.put(EditProfileController());
 
   @override
   Widget build(BuildContext context) {
@@ -74,7 +77,7 @@ class EditProfileScreen extends GetView<EditProfileController> {
                 "45 New Avenue, New York",
               ),
               const SizedBox(height: 24),
-              buildSubmitButton(controller.handleSubmit),
+              buildSubmitButton(controller.handleSubmit, "Submit"),
             ],
           ),
         ),
@@ -83,102 +86,102 @@ class EditProfileScreen extends GetView<EditProfileController> {
   }
 }
 
-class EditProfileForm extends StatefulWidget {
-  const EditProfileForm({super.key});
+// class EditProfileForm extends StatefulWidget {
+//   const EditProfileForm({super.key});
 
-  @override
-  State<EditProfileForm> createState() => _EditProfileFormState();
-}
+//   @override
+//   State<EditProfileForm> createState() => _EditProfileFormState();
+// }
 
-class _EditProfileFormState extends State<EditProfileForm> {
-  final _formKey = GlobalKey<FormState>();
+// class _EditProfileFormState extends State<EditProfileForm> {
+//   final _formKey = GlobalKey<FormState>();
 
-  final TextEditingController fullNameController = TextEditingController();
-  final TextEditingController businessNameController = TextEditingController();
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController phoneController = TextEditingController();
-  final TextEditingController addressController = TextEditingController();
+//   final TextEditingController fullNameController = TextEditingController();
+//   final TextEditingController businessNameController = TextEditingController();
+//   final TextEditingController emailController = TextEditingController();
+//   final TextEditingController phoneController = TextEditingController();
+//   final TextEditingController addressController = TextEditingController();
 
-  String selectedCountry = 'United States';
-  String selectedGender = 'Female';
+//   String selectedCountry = 'United States';
+//   String selectedGender = 'Female';
 
-  @override
-  void dispose() {
-    fullNameController.dispose();
-    businessNameController.dispose();
-    emailController.dispose();
-    phoneController.dispose();
-    addressController.dispose();
-    super.dispose();
-  }
+//   @override
+//   void dispose() {
+//     fullNameController.dispose();
+//     businessNameController.dispose();
+//     emailController.dispose();
+//     phoneController.dispose();
+//     addressController.dispose();
+//     super.dispose();
+//   }
 
-  void _handleSubmit() {
-    if (_formKey.currentState!.validate()) {
-      // Submit form logic here
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Profile updated!')));
-    }
-  }
+//   void _handleSubmit() {
+//     if (_formKey.currentState!.validate()) {
+//       // Submit form logic here
+//       ScaffoldMessenger.of(
+//         context,
+//       ).showSnackBar(const SnackBar(content: Text('Profile updated!')));
+//     }
+//   }
 
-  @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            buildTextField("Full name", fullNameController, "Eddy K"),
-            buildTextField(
-              "Business Name",
-              businessNameController,
-              "Eddiecare",
-            ),
-            buildTextField("Mail", emailController, "youremail@domain.com"),
-            buildPhoneField(),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: buildDropdownField(
-                    "Country",
-                    selectedCountry,
-                    ['United States', 'India', 'Canada'],
-                    (value) {
-                      setState(() {
-                        selectedCountry = value!;
-                      });
-                    },
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: buildDropdownField(
-                    "Genre",
-                    selectedGender,
-                    ['Male', 'Female', 'Other'],
-                    (value) {
-                      setState(() {
-                        selectedGender = value!;
-                      });
-                    },
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            buildTextField(
-              "Address",
-              addressController,
-              "45 New Avenue, New York",
-            ),
-            const SizedBox(height: 24),
-            buildSubmitButton(_handleSubmit),
-          ],
-        ),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return SingleChildScrollView(
+//       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+//       child: Form(
+//         key: _formKey,
+//         child: Column(
+//           crossAxisAlignment: CrossAxisAlignment.start,
+//           children: [
+//             buildTextField("Full name", fullNameController, "Eddy K"),
+//             buildTextField(
+//               "Business Name",
+//               businessNameController,
+//               "Eddiecare",
+//             ),
+//             buildTextField("Mail", emailController, "youremail@domain.com"),
+//             buildPhoneField(),
+//             const SizedBox(height: 12),
+//             Row(
+//               children: [
+//                 Expanded(
+//                   child: buildDropdownField(
+//                     "Country",
+//                     selectedCountry,
+//                     ['United States', 'India', 'Canada'],
+//                     (value) {
+//                       setState(() {
+//                         selectedCountry = value!;
+//                       });
+//                     },
+//                   ),
+//                 ),
+//                 const SizedBox(width: 16),
+//                 Expanded(
+//                   child: buildDropdownField(
+//                     "Genre",
+//                     selectedGender,
+//                     ['Male', 'Female', 'Other'],
+//                     (value) {
+//                       setState(() {
+//                         selectedGender = value!;
+//                       });
+//                     },
+//                   ),
+//                 ),
+//               ],
+//             ),
+//             const SizedBox(height: 12),
+//             buildTextField(
+//               "Address",
+//               addressController,
+//               "45 New Avenue, New York",
+//             ),
+//             const SizedBox(height: 24),
+//             buildSubmitButton(_handleSubmit),
+//           ],
+//         ),
+//       ),
+//     );
+//   }
+// }

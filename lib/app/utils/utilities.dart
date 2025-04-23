@@ -127,7 +127,7 @@ Widget buildPhoneField() {
   );
 }
 
-Widget buildSubmitButton(VoidCallback onPressed) {
+Widget buildSubmitButton(VoidCallback onPressed, String buttonText) {
   return SizedBox(
     width: double.infinity,
     child: ElevatedButton(
@@ -137,8 +137,8 @@ Widget buildSubmitButton(VoidCallback onPressed) {
         padding: const EdgeInsets.symmetric(vertical: 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
-      child: const Text(
-        "Next",
+      child: Text(
+        buttonText,
         style: TextStyle(color: Colors.white, fontSize: 16),
       ),
     ),

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:invoicing_fe/app/routes/app_routes.dart';
-import 'package:invoicing_fe/values/values.dart';
 
 import '../../../components/top_bar.dart';
+import '../../../values/values.dart';
 import '../../controllers/profile/profile_controller.dart';
+import '../../routes/app_routes.dart';
 
 class ProfileScreen extends StatelessWidget {
   ProfileScreen({super.key});

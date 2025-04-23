@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../components/top_bar.dart';
+import '../../../values/values.dart';
 
 class ProductScreen extends StatelessWidget {
   const ProductScreen({super.key});
@@ -10,7 +11,7 @@ class ProductScreen extends StatelessWidget {
     final screenSize = MediaQuery.of(context).size;
     return Scaffold(
       // extendBodyBehindAppBar: true,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColor.pageColor,
       appBar: TopBar(
         title: "Products",
         // leadingIcon: Icon(Icons, size: 30),

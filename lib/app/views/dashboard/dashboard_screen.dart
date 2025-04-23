@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invoicing_fe/values/values.dart';
 
 import '../../../components/top_bar.dart';
 
@@ -8,7 +9,7 @@ class DashboardScreen extends StatelessWidget {
     final screenSize = MediaQuery.of(context).size;
     return Scaffold(
       // extendBodyBehindAppBar: true,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColor.pageColor,
       appBar: const TopBar(
         // title: "Home",
         leadingIcon: Icon(Icons.dashboard_customize_outlined, size: 30),

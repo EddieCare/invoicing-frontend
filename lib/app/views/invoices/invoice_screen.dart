@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:invoicing_fe/values/values.dart';
 
 import '../../../components/top_bar.dart';
 
@@ -10,7 +11,7 @@ class InvoiceScreen extends StatelessWidget {
     final screenSize = MediaQuery.of(context).size;
     return Scaffold(
       // extendBodyBehindAppBar: true,
-      backgroundColor: Colors.white,
+      backgroundColor: AppColor.pageColor,
       appBar: TopBar(
         title: "Invoices",
         // leadingIcon: Icon(Icons, size: 30),
