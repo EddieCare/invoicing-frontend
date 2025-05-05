@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:invoicing_fe/app/controllers/auth/signup_controller.dart';
 import '../../../components/Buttons.dart';
+import '../../../values/values.dart';
 import '../../routes/app_routes.dart';
 import '../../../components/custom_text_field.dart';
 
@@ -11,6 +12,7 @@ class SignupScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColor.pageColor,
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

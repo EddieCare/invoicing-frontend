@@ -21,14 +21,12 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: MediaQuery.of(context).size.width,
-      padding: const EdgeInsets.all(10),
       child: ElevatedButton.icon(
         onPressed: onPressed ?? () {}, // Default: does nothing
         // icon: Icon(icon, color: Colors.white, size: 26),
         style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(vertical: 4),
           backgroundColor: backgroundColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(borderRadius),

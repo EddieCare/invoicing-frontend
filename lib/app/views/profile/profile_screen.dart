@@ -19,20 +19,13 @@ class ProfileScreen extends StatelessWidget {
       backgroundColor: AppColor.pageColor,
       appBar: TopBar(
         title: "Settings",
-        leadingIcon: Icon(Icons.settings, size: 30),
+        // leadingIcon: Icon(Icons.settings, size: 30),
         showBackButton: false,
+        showMenu: true,
         actions: [
           Row(
             children: [
-              IconButton(icon: Icon(Icons.search, size: 28), onPressed: () {}),
-              IconButton(
-                icon: Icon(Icons.menu, size: 28),
-                onPressed: () {
-                  ScaffoldMessenger.of(
-                    context,
-                  ).showSnackBar(SnackBar(content: Text("Coming Soon")));
-                },
-              ),
+              // IconButton(icon: Icon(Icons.search, size: 28), onPressed: () {}),
             ],
           ),
         ],
@@ -78,11 +71,16 @@ class ProfileScreen extends StatelessWidget {
             _buildSettingsCard(
               context,
               children: [
-                _buildListTile(Icons.edit, "Edit profile information"),
+                _buildListTile(
+                  Icons.edit,
+                  "Edit profile information",
+                  onTap: () => {Get.toNamed(Routes.editProfile)},
+                ),
                 _buildListTile(
                   Icons.notifications_none,
                   "Notifications",
                   trailing: Text("ON", style: TextStyle(color: Colors.green)),
+                  onTap: () => {Get.toNamed(Routes.notificationScreen)},
                 ),
                 _buildListTile(
                   Icons.language,
@@ -91,6 +89,7 @@ class ProfileScreen extends StatelessWidget {
                     "English",
                     style: TextStyle(color: Colors.blue),
                   ),
+                  onTap: () => {Get.toNamed(Routes.languageScreen)},
                 ),
               ],
             ),
@@ -134,12 +133,17 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildListTile(IconData icon, String title, {Widget? trailing}) {
+  Widget _buildListTile(
+    IconData icon,
+    String title, {
+    Widget? trailing,
+    VoidCallback? onTap,
+  }) {
     return ListTile(
       leading: Icon(icon, size: 24, color: Colors.black),
       title: Text(title, style: TextStyle(fontSize: 16)),
       trailing: trailing,
-      onTap: () {},
+      onTap: onTap,
     );
   }
 }

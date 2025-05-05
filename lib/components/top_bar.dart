@@ -1,31 +1,51 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:invoicing_fe/app/controllers/sidebar/sidebar_controller.dart';
+import 'package:invoicing_fe/app/routes/app_routes.dart';
 
 class TopBar extends StatelessWidget implements PreferredSizeWidget {
-  final Icon? leadingIcon;
+  final Widget? leadingIcon;
   final String? title;
   final bool showBackButton;
+  final bool centerTitle;
+  final bool showMenu;
+  final bool showAddInvoice;
   final List<Widget> actions;
 
-  const TopBar({
+  final SidebarController sidebarController = Get.put(SidebarController());
+
+  TopBar({
     super.key,
     this.title,
     this.showBackButton = false,
     this.actions = const [],
     this.leadingIcon,
+    this.centerTitle = false,
+    this.showMenu = false,
+    this.showAddInvoice = true,
   });
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setSystemUIOverlayStyle(
+      SystemUiOverlayStyle(
+        statusBarColor: Colors.red, // Set the status bar color
+        statusBarIconBrightness:
+            Brightness.light, // Set the icon brightness (light or dark)
+      ),
+    );
     return SafeArea(
       child: Container(
         height: preferredSize.height,
         child: ClipRRect(
           child: Container(
             color: Colors.white.withAlpha(50), // Soft transparent background
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 18),
             child: Row(
               children: [
+                SizedBox(width: 8),
                 if (leadingIcon != null) SizedBox(child: leadingIcon),
                 if (showBackButton)
                   IconButton(
@@ -37,6 +57,7 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                 Expanded(
                   child: Text(
                     title ?? "",
+                    textAlign: centerTitle ? TextAlign.center : TextAlign.left,
                     style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -44,6 +65,16 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                   ),
                 ),
                 ...actions,
+                if (showAddInvoice)
+                  IconButton(
+                    icon: const Icon(Icons.post_add, size: 30),
+                    onPressed: () => Get.toNamed(Routes.createInvoice),
+                  ),
+                if (showMenu)
+                  IconButton(
+                    icon: const Icon(Icons.menu, size: 30),
+                    onPressed: () => sidebarController.toggleSidebar(),
+                  ),
               ],
             ),
           ),

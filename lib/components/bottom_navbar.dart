@@ -29,6 +29,7 @@ class CustomBottomNav extends StatelessWidget {
             children: [
               _buildNavItem(Icons.home_outlined, "Home", 0),
               _buildNavItem(Icons.wb_sunny_outlined, "Invoices", 1),
+              // _buildNavItem(Icons.post_add, "New Invoice", 2),
               _buildNavItem(Icons.search, "Product", 2),
               // _buildNavItem(Icons.person_outline, "Profile", 3),
               _buildNavItem(Icons.settings_outlined, "Settings", 3),
@@ -49,7 +50,12 @@ class CustomBottomNav extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(icon, color: isSelected ? Colors.black : Colors.grey.shade500),
+            Icon(
+              icon,
+              color: isSelected ? Colors.black : Colors.grey.shade500,
+              size: 28,
+              // size: icon == Icons.post_add ? 50 : 25,
+            ),
             const SizedBox(height: 4),
             Text(
               label,

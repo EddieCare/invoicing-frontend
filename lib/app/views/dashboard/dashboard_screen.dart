@@ -10,14 +10,18 @@ class DashboardScreen extends StatelessWidget {
     return Scaffold(
       // extendBodyBehindAppBar: true,
       backgroundColor: AppColor.pageColor,
-      appBar: const TopBar(
+      appBar: TopBar(
         // title: "Home",
-        leadingIcon: Icon(Icons.dashboard_customize_outlined, size: 30),
+        leadingIcon: Padding(
+          padding: const EdgeInsets.only(left: 14),
+          child: Icon(Icons.dashboard_customize_outlined, size: 30),
+        ),
         showBackButton: false,
+        showMenu: true,
         actions: [
           Icon(Icons.notifications_none, size: 30),
           SizedBox(width: 12),
-          Icon(Icons.menu, size: 30),
+          // Icon(Icons.menu, size: 30),
         ],
       ),
       body: SingleChildScrollView(
