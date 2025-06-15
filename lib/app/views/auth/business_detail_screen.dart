@@ -109,6 +109,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:invoicedaily/app/routes/app_routes.dart';
 import '../../../components/Buttons.dart';
 import '../../../values/values.dart';
 import '../../controllers/auth/vendor_detail_controller.dart';
@@ -186,7 +187,7 @@ class BusinessDetailScreen extends StatelessWidget {
                 onPressed: () => controller.submitDetails(),
               ),
               TextButton(
-                onPressed: () => Get.back(),
+                onPressed: () => {Get.toNamed(Routes.authMain)},
                 child: const Text(
                   "Go back",
                   style: TextStyle(color: Colors.black, fontSize: 14),

@@ -1,6 +1,7 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:lottie/lottie.dart';
 
 import '../../../values/values.dart';
 import '../../controllers/auth/auth_main_controller.dart';
@@ -31,13 +32,13 @@ class AuthMainScreen extends StatelessWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         children: [
-                          const SizedBox(height: 80),
+                          const SizedBox(height: 130),
                           Image.asset(
                             "assets/images/logo.png",
                             width: 100,
                             height: 100,
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 10),
                           Text(
                             "Invoice Daily",
                             style: TextStyle(
@@ -45,9 +46,9 @@ class AuthMainScreen extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 10),
                           Text(
-                            "Create professional invoices in seconds",
+                            "Create professional invoices in \nseconds",
                             textAlign: TextAlign.center,
                             style: TextStyle(fontSize: 18 * textScale),
                           ),
@@ -56,6 +57,12 @@ class AuthMainScreen extends StatelessWidget {
                         ],
                       ),
                     ),
+                  ),
+
+                  Lottie.asset(
+                    "assets/lottie/welcome.json",
+                    width: 200,
+                    height: 200,
                   ),
 
                   // Bottom - Terms & Privacy
@@ -144,17 +151,19 @@ class AuthMainScreen extends StatelessWidget {
                           textAlign: TextAlign.center,
                           text: TextSpan(
                             style: TextStyle(
-                              fontSize: 12 * textScale,
+                              fontSize: 14 * textScale,
                               color: Colors.black,
                             ),
                             children: [
                               const TextSpan(
-                                text: "By continuing you are agreeing to our",
+                                text: "By continuing you are agreeing to our\n",
+                                style: TextStyle(height: 4),
                               ),
                               TextSpan(
                                 text: "Term's of Use",
                                 style: const TextStyle(
                                   decoration: TextDecoration.underline,
+                                  fontWeight: FontWeight.w700,
                                   color: Colors.blue,
                                 ),
                                 recognizer:
@@ -171,6 +180,7 @@ class AuthMainScreen extends StatelessWidget {
                                 text: "Privacy Policy",
                                 style: const TextStyle(
                                   decoration: TextDecoration.underline,
+                                  fontWeight: FontWeight.w700,
                                   color: Colors.blue,
                                 ),
                                 recognizer:
