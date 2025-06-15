@@ -20,6 +20,7 @@ class EditProfileScreen extends StatelessWidget {
         title: "Edit Profile",
         // leadingIcon: Icon(Icons.arrow_back_ios, size: 30),
         showBackButton: true,
+        showAddInvoice: false,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -43,8 +44,8 @@ class EditProfileScreen extends StatelessWidget {
                 controller.emailController,
                 "youremail@domain.com",
               ),
-              buildPhoneField(),
-              const SizedBox(height: 12),
+              // buildPhoneField(),
+              // const SizedBox(height: 12),
               Row(
                 children: [
                   Expanded(
@@ -61,7 +62,7 @@ class EditProfileScreen extends StatelessWidget {
                   Expanded(
                     child: Obx(
                       () => buildDropdownField(
-                        "Genre",
+                        "Gender",
                         controller.selectedGender.value,
                         ['Male', 'Female', 'Other'],
                         (value) => controller.selectedGender.value = value!,

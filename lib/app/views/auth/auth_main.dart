@@ -39,7 +39,7 @@ class AuthMainScreen extends StatelessWidget {
                           ),
                           const SizedBox(height: 20),
                           Text(
-                            "Atlas Invoice",
+                            "Invoice Daily",
                             style: TextStyle(
                               fontSize: 26 * textScale,
                               fontWeight: FontWeight.bold,
@@ -52,10 +52,7 @@ class AuthMainScreen extends StatelessWidget {
                             style: TextStyle(fontSize: 18 * textScale),
                           ),
                           const SizedBox(height: 20),
-                          Image.asset("assets/images/arc1.png", width: 100),
-                          // const SizedBox(height: 30),
-                          // Flexible(child: AnimatedFeatureCarousel()),
-                          // const SizedBox(height: 40),
+                          // Image.asset("assets/images/arc1.png", width: 100),
                         ],
                       ),
                     ),
@@ -71,8 +68,40 @@ class AuthMainScreen extends StatelessWidget {
                     child: Column(
                       children: [
                         const SizedBox(height: 30),
-                        AnimatedFeatureCarousel(),
+                        // AnimatedFeatureCarousel(),
                         const SizedBox(height: 40),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed: controller.signInWithGoogle,
+                            icon: Image.asset(
+                              "assets/icons/google.png",
+                              height: 24,
+                            ),
+                            label: Text(
+                              "Sign in with Google",
+                              style: TextStyle(
+                                fontSize: 18 * textScale,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white,
+                              ),
+                            ),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.black,
+                              foregroundColor: Colors.black,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 14,
+                                horizontal: 20,
+                              ),
+                            ),
+                          ),
+                        ),
+                        // const SizedBox(height: 20),
+                        // Text("---------------- Or ----------------"),
+                        const SizedBox(height: 20),
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton.icon(
@@ -80,6 +109,7 @@ class AuthMainScreen extends StatelessWidget {
                             icon: const Icon(
                               Icons.email_outlined,
                               color: Colors.white,
+                              size: 24,
                             ),
                             style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.black,
@@ -89,7 +119,7 @@ class AuthMainScreen extends StatelessWidget {
                               padding: const EdgeInsets.symmetric(vertical: 14),
                             ),
                             label: Text(
-                              "Login with email",
+                              "Sign in with Email",
                               style: TextStyle(
                                 fontSize: 18 * textScale,
                                 fontWeight: FontWeight.w500,
@@ -98,6 +128,7 @@ class AuthMainScreen extends StatelessWidget {
                             ),
                           ),
                         ),
+                        const SizedBox(height: 20),
                         TextButton(
                           onPressed: () => Get.toNamed(Routes.signup),
                           child: Text(
@@ -118,7 +149,7 @@ class AuthMainScreen extends StatelessWidget {
                             ),
                             children: [
                               const TextSpan(
-                                text: "By continuing you are agreeing to our ",
+                                text: "By continuing you are agreeing to our",
                               ),
                               TextSpan(
                                 text: "Term's of Use",
@@ -169,131 +200,5 @@ class AuthMainScreen extends StatelessWidget {
   void launchDummyLink(String url) {
     // For now, use print statement. Replace with url_launcher if needed.
     print("Open link: $url");
-  }
-}
-
-// class AnimatedFeatureCarousel extends StatefulWidget {
-//   const AnimatedFeatureCarousel({Key? key}) : super(key: key);
-
-//   @override
-//   State<AnimatedFeatureCarousel> createState() =>
-//       _AnimatedFeatureCarouselState();
-// }
-
-// class _AnimatedFeatureCarouselState extends State<AnimatedFeatureCarousel> {
-//   final List<String> features = [
-//     "https://s3u.tmimgcdn.com/800x0/2307735-1605599531781_TM-03.jpg",
-//     "https://cdn.shopify.com/s/files/1/1246/6441/articles/Design_for_Small_Store.png?v=1727354596",
-//     "https://cdni.iconscout.com/illustration/premium/thumb/pharmacy-store-billing-counter-illustration-download-in-svg-png-gif-file-formats--bill-chemist-storefront-outlet-pack-medical-professionals-illustrations-4440163.png",
-//     "https://static.vecteezy.com/system/resources/previews/002/035/092/non_2x/supermarket-grocery-store-interior-flat-illustration-vector.jpg",
-//   ];
-
-//   int _currentIndex = 0;
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     Future.doWhile(() async {
-//       await Future.delayed(const Duration(seconds: 3));
-//       if (!mounted) return false;
-//       setState(() {
-//         _currentIndex = (_currentIndex + 1) % features.length;
-//       });
-//       return true;
-//     });
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     final textScale = MediaQuery.of(context).textScaleFactor;
-//     return AnimatedSwitcher(
-//       duration: const Duration(milliseconds: 600),
-//       transitionBuilder:
-//           (child, animation) =>
-//               FadeTransition(opacity: animation, child: child),
-//       child: Container(
-//         height: 300,
-//         decoration: BoxDecoration(
-//           borderRadius: BorderRadius.all(Radius.circular(20)),
-//         ),
-//         width: MediaQuery.of(context).size.width * 0.95,
-//         key: ValueKey(_currentIndex),
-//         child: ClipRect(
-//           child: Image.network(
-//             features[_currentIndex],
-//             key: ValueKey(_currentIndex),
-//             fit: BoxFit.cover,
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
-
-class AnimatedFeatureCarousel extends StatefulWidget {
-  const AnimatedFeatureCarousel({Key? key}) : super(key: key);
-
-  @override
-  State<AnimatedFeatureCarousel> createState() =>
-      _AnimatedFeatureCarouselState();
-}
-
-class _AnimatedFeatureCarouselState extends State<AnimatedFeatureCarousel> {
-  final List<String> features = [
-    "https://s3u.tmimgcdn.com/800x0/2307735-1605599531781_TM-03.jpg",
-    "https://cdn.shopify.com/s/files/1/1246/6441/articles/Design_for_Small_Store.png?v=1727354596",
-    "https://cdni.iconscout.com/illustration/premium/thumb/pharmacy-store-billing-counter-illustration-download-in-svg-png-gif-file-formats--bill-chemist-storefront-outlet-pack-medical-professionals-illustrations-4440163.png",
-    "https://static.vecteezy.com/system/resources/previews/002/035/092/non_2x/supermarket-grocery-store-interior-flat-illustration-vector.jpg",
-  ];
-
-  int _currentIndex = 0;
-
-  @override
-  void initState() {
-    super.initState();
-    Future.doWhile(() async {
-      await Future.delayed(const Duration(seconds: 3));
-      if (!mounted) return false;
-      setState(() {
-        _currentIndex = (_currentIndex + 1) % features.length;
-      });
-      return true;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        double width = constraints.maxWidth;
-        double height = width * 0.6; // Maintain a consistent aspect ratio
-
-        return AnimatedSwitcher(
-          duration: const Duration(milliseconds: 600),
-          transitionBuilder:
-              (child, animation) =>
-                  FadeTransition(opacity: animation, child: child),
-          child: Container(
-            key: ValueKey(_currentIndex),
-            width: width,
-            height: height,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 8,
-                  offset: Offset(0, 4),
-                ),
-              ],
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: Image.network(features[_currentIndex], fit: BoxFit.cover),
-            ),
-          ),
-        );
-      },
-    );
   }
 }

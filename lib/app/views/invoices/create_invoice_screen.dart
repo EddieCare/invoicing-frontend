@@ -1,10 +1,11 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:invoicing_fe/app/controllers/invoice/invoice_controller.dart';
-import 'package:invoicing_fe/values/values.dart';
+import 'package:intl/intl.dart';
+
+import '../../../components/dashed_rect.dart';
 import '../../../components/top_bar.dart';
+import '../../../values/values.dart';
+import '../../controllers/invoice/invoice_controller.dart';
 
 class CreateInvoiceScreen extends StatelessWidget {
   CreateInvoiceScreen({super.key});
@@ -25,60 +26,92 @@ class CreateInvoiceScreen extends StatelessWidget {
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _buildInvoiceDetails(),
-            const SizedBox(height: 20),
-            _buildSectionTitle("SERVICE"),
-            _buildServiceItem(
-              "10 screen Website Design",
-              "QYT X 1 \$200",
-              "\$2000",
-              highlighted: true,
-            ),
-            _buildServiceItem(
-              "20 screen Mobile Design",
-              "QYT X 1 \$200",
-              "\$2000",
-            ),
-            _buildServiceItem("Mobile Development", "QYT X 1 \$6000", "\$2000"),
-            _addButton("Add Service", black: true),
-            const SizedBox(height: 24),
-            _buildSectionTitle("PRODUCT"),
-            _buildProductItem(
-              "10 screen Website Design",
-              "QYT X 1 \$200",
-              "\$2000",
-            ),
-            _buildProductItem(
-              "20 screen Mobile Design",
-              "QYT X 1 \$200",
-              "\$2000",
-            ),
-            _addButton("Add Product", black: false),
-            const SizedBox(height: 24),
-            _buildDiscountTaxSummary(),
-            const SizedBox(height: 24),
-            _buildClientCard(),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                _actionButton("Save", black: true),
-                const SizedBox(width: 10),
-                _actionButton("Discard", black: true),
-              ],
-            ),
-            const SizedBox(height: 40),
-          ],
+        child: Obx(
+          () => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildInvoiceDetails(context),
+              const SizedBox(height: 20),
+              _buildSectionTitle("SERVICE"),
+              if (controller.selectedServices.length == 0)
+                emptyBox("Add services to the list"),
+              ...controller.selectedServices.map((service) {
+                return _buildServiceItem(
+                  service['name'],
+                  "QYT X ${service['quantity'] ?? 1} ₹${service['price']}",
+                  "₹${(service['price'] * (service['quantity'] ?? 1))}",
+                  highlighted: true,
+                  () => {controller.removeService(service)},
+                );
+              }).toList(),
+              _addButton(
+                "Add Service",
+                black: true,
+                onTap: () => _showServicePopup(Get.find<InvoiceController>()),
+              ),
+              const SizedBox(height: 24),
+              _buildSectionTitle("PRODUCT"),
+              if (controller.selectedProducts.length == 0)
+                emptyBox("Add products to the list"),
+              ...controller.selectedProducts.map((product) {
+                return _buildProductItem(
+                  product['name'],
+                  "QYT X ${product['quantity'] ?? 1} ₹${product['price']}",
+                  "₹${(product['price'] * (product['quantity'] ?? 1))}",
+                  () => {controller.removeProduct(product)},
+                );
+              }).toList(),
+              _addButton(
+                "Add Product",
+                black: false,
+                onTap: () => _showProductPopup(Get.find<InvoiceController>()),
+              ),
+              const SizedBox(height: 24),
+              _buildDiscountTaxSummary(),
+              const SizedBox(height: 24),
+              _buildClientCard(),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  _actionButton("Save", black: true),
+                  const SizedBox(width: 10),
+                  _actionButton("Discard", black: true),
+                ],
+              ),
+              const SizedBox(height: 40),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildInvoiceDetails() {
+  CustomPaint emptyBox(text) {
+    return CustomPaint(
+      painter: DashedBorderPainter(
+        color: AppColor.textColorPrimary.withAlpha(50),
+        strokeWidth: 3.0,
+        dashWidth: 12.0,
+        dashSpace: 8.0,
+        borderRadius: const BorderRadius.all(
+          Radius.circular(20),
+        ), // Rounded corners
+      ),
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(30.0),
+          child: Text(
+            text,
+            style: TextStyle(color: AppColor.textColorPrimary.withAlpha(100)),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInvoiceDetails(context) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -102,8 +135,24 @@ class CreateInvoiceScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              _dateColumn("Issue Date *", "March 4, 2025"),
-              _dateColumn("Due Date *", "March 4, 2025"),
+              _dateColumn("Issue Date", controller.issueDate.value, () async {
+                DateTime? picked = await showDatePicker(
+                  context: context,
+                  initialDate: controller.issueDate.value,
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2100),
+                );
+                if (picked != null) controller.setIssueDate(picked);
+              }),
+              _dateColumn("Due Date", controller.dueDate.value, () async {
+                DateTime? picked = await showDatePicker(
+                  context: context,
+                  initialDate: controller.dueDate.value,
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2100),
+                );
+                if (picked != null) controller.setDueDate(picked);
+              }),
             ],
           ),
         ],
@@ -111,17 +160,23 @@ class CreateInvoiceScreen extends StatelessWidget {
     );
   }
 
-  Widget _dateColumn(String title, String date) {
+  Widget _dateColumn(String title, DateTime date, VoidCallback onTap) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: TextStyle(color: Colors.black54)),
-        Row(
-          children: [
-            Text(date, style: TextStyle(fontWeight: FontWeight.bold)),
-            const SizedBox(width: 6),
-            const Icon(Icons.calendar_today, size: 18),
-          ],
+        Text(title, style: const TextStyle(color: Colors.black54)),
+        InkWell(
+          onTap: onTap,
+          child: Row(
+            children: [
+              Text(
+                DateFormat('yMMMd').format(date),
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(width: 6),
+              const Icon(Icons.calendar_today, size: 18),
+            ],
+          ),
         ),
       ],
     );
@@ -138,7 +193,8 @@ class CreateInvoiceScreen extends StatelessWidget {
   Widget _buildServiceItem(
     String title,
     String subtitle,
-    String price, {
+    String price,
+    removeItem, {
     bool highlighted = false,
   }) {
     return Container(
@@ -159,13 +215,29 @@ class CreateInvoiceScreen extends StatelessWidget {
               Text(subtitle, style: TextStyle(color: Colors.black54)),
             ],
           ),
-          Text(price, style: TextStyle(fontWeight: FontWeight.bold)),
+          Row(
+            children: [
+              Text(price, style: TextStyle(fontWeight: FontWeight.bold)),
+              IconButton(
+                onPressed: removeItem,
+                icon: Icon(
+                  Icons.delete_outline_outlined,
+                  color: Colors.red[400],
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildProductItem(String title, String subtitle, String price) {
+  Widget _buildProductItem(
+    String title,
+    String subtitle,
+    String price,
+    removeItem,
+  ) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 6),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -189,23 +261,37 @@ class CreateInvoiceScreen extends StatelessWidget {
               Text(subtitle, style: TextStyle(color: Colors.white70)),
             ],
           ),
-          Text(
-            price,
-            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+          Row(
+            children: [
+              Text(
+                price,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              IconButton(
+                onPressed: removeItem,
+                icon: Icon(
+                  Icons.delete_outline_outlined,
+                  color: Colors.red[400],
+                ),
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-  Widget _addButton(String label, {bool black = true}) {
+  Widget _addButton(String label, {bool black = true, onTap}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 8.0),
           child: OutlinedButton.icon(
-            onPressed: () {},
+            onPressed: onTap,
             icon: Transform.rotate(
               angle: -100,
               child: Icon(Icons.arrow_circle_up_rounded, size: 24),
@@ -357,6 +443,176 @@ class CreateInvoiceScreen extends StatelessWidget {
       ),
       onPressed: onTap ?? () {},
       child: Text(text),
+    );
+  }
+
+  void _showProductPopup(InvoiceController controller) {
+    final RxMap<String, int> tempQuantities = <String, int>{}.obs;
+
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Obx(
+          () => ListView(
+            shrinkWrap: true,
+            children:
+                controller.allProducts.map((product) {
+                  final productId = product['id'] ?? product['name'];
+                  final qty = tempQuantities[productId] ?? 0;
+
+                  return ListTile(
+                    title: Text(product['name']),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("₹${product['price']}"),
+                        const SizedBox(height: 8),
+                      ],
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min, // This is the key fix
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.remove_circle_outline),
+                          onPressed:
+                              qty > 0
+                                  ? () {
+                                    tempQuantities[productId] = qty - 1;
+                                    tempQuantities.refresh();
+                                  }
+                                  : null,
+                        ),
+                        Text('$qty'),
+                        IconButton(
+                          icon: const Icon(Icons.add_circle_outline),
+                          onPressed: () {
+                            tempQuantities[productId] = qty + 1;
+                            tempQuantities.refresh();
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          style: ButtonStyle(
+                            backgroundColor: WidgetStateProperty.all(
+                              Colors.black,
+                            ),
+                            shape: WidgetStateProperty.all(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          ),
+                          onPressed:
+                              qty > 0
+                                  ? () {
+                                    controller.addProduct({
+                                      ...product,
+                                      'quantity': qty,
+                                    });
+                                    // Get.back();
+                                  }
+                                  : null,
+                          child: const Text(
+                            "Add",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _showServicePopup(InvoiceController controller) {
+    final RxMap<String, int> tempQuantities = <String, int>{}.obs;
+
+    Get.bottomSheet(
+      Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Obx(
+          () => ListView(
+            shrinkWrap: true,
+            children:
+                controller.allServices.map((service) {
+                  final productId = service['id'] ?? service['name'];
+                  final qty = tempQuantities[productId] ?? 0;
+
+                  return ListTile(
+                    title: Text(service['name']),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("₹${service['price']}"),
+                        const SizedBox(height: 8),
+                      ],
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min, // This is the key fix
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.remove_circle_outline),
+                          onPressed:
+                              qty > 0
+                                  ? () {
+                                    tempQuantities[productId] = qty - 1;
+                                    tempQuantities.refresh();
+                                  }
+                                  : null,
+                        ),
+                        Text('$qty'),
+                        IconButton(
+                          icon: const Icon(Icons.add_circle_outline),
+                          onPressed: () {
+                            tempQuantities[productId] = qty + 1;
+                            tempQuantities.refresh();
+                          },
+                        ),
+                        const SizedBox(width: 8),
+                        ElevatedButton(
+                          style: ButtonStyle(
+                            backgroundColor: WidgetStateProperty.all(
+                              Colors.black,
+                            ),
+                            shape: WidgetStateProperty.all(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                          ),
+                          onPressed:
+                              qty > 0
+                                  ? () {
+                                    controller.addService({
+                                      ...service,
+                                      'hours': qty,
+                                    });
+                                    // Get.back();
+                                  }
+                                  : null,
+                          child: const Text(
+                            "Add",
+                            style: TextStyle(color: Colors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+          ),
+        ),
+      ),
     );
   }
 }

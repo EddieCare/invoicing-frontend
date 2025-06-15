@@ -7,9 +7,12 @@ abstract class Routes {
   static const businessDetails = '/businessDetails';
   static const baseScreen = '/baseScreen';
   static const dashboard = '/dashboard';
-  static const editProfile = '/editProfile';
   static const notificationScreen = '/notificationScreen';
+
+  // Profile
+  static const editProfile = '/editProfile';
   static const languageScreen = '/languageScreen';
+  static const plansScreen = '/plansScreen';
 
   // Invoices
   static const createInvoice = '/createInvoice';
@@ -20,4 +23,7 @@ abstract class Routes {
   static const addProductScreen = '/addProductScreen';
   static const viewProductScreen = '/viewProductScreen';
   static const editProductScreen = '/editProductScreen';
+
+  // Product
+  static const shopDetailScreen = '/shopDetailScreen';
 }

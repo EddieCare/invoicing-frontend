@@ -1,0 +1,76 @@
+{
+    "Vendor": {
+        "name": "Example Vendor",
+        "email": "jane@example.com",
+        "phone": "+1-234-567-8900",
+        "address": {
+            "street": "123 Example St",
+            "city": "Example City",
+            "state": "EX",
+            "zip": "12345",
+            "country": "Example Country"
+        },
+        "companyRegistrationNumber": "REG-23982938",
+        "isActive": true,
+        "isSubscribed": true,
+        "createdAt": "2025-05-20T12:00:00Z",
+        "updatedAt": "2025-05-20T12:00:00Z",
+        "createdBy": "adminUser_001",
+        "catagory": "Wholesale",
+        "businessType": "LLC",
+        "payment_method": "Credit Card",
+        "card_details": {
+            "card_number": "1234-5678-9012-3456",
+            "expiry_date": "12/25",
+            "cvv": "123"
+        },
+        "bank_details": {
+            "bank_name": "Example Bank",
+            "account_number": "1234567890",
+            "ifsc_code": "EXAMPLE123"
+        }
+    },
+    "Shop": {
+        "shopId": "shop_nyc001",
+        "shopName": "Alpha Supplies - Manhattan",
+        "vendorId": "vendor_abc123",
+        "gst_number": "YUOGSUHAY6787543",
+        "tax_number": "TAX-123456789",
+        "shop_type": "Retail",
+        "shop_category": "Electronics",
+        "shop_email": "shops@gmail.com",
+        "shop_phone": "+1-234-567-8900",
+        "shop_address": {
+            "street": "456 Main Street",
+            "city": "New York",
+            "state": "NY",
+            "zip": "10001",
+            "country": "USA"
+        },
+        "isActive": true,
+        "createdAt": "2025-05-20T12:00:00Z",
+        "updatedAt": "2025-05-20T12:00:00Z",
+        "createdBy": "adminUser_001"
+    },
+    "Invoice": {
+        "invoiceId": "INV-2025-001",
+        "vendorId": "vendor_abc123",
+        "shopId": "shop_nyc001",
+        "invoiceDate": "2025-05-20T12:00:00Z",
+        "discount": 10.00,
+        "tax": 5.00,
+        "dueDate": "2025-06-20T12:00:00Z",
+        "totalAmount": 1500.00,
+        "payment_status": true,
+        "createdAt": "2025-05-20T12:00:00Z",
+        "updatedAt": "2025-05-20T12:00:00Z",
+        "createdBy": "adminUser_001",
+        "payment_method": "Visa",
+        "Consumer": {
+            "consumerName": "John Doe",
+            "consumerEmail": "johndow@gmail.com",
+            "consumerPhone": "+1-234-567-8900",
+            "payment_method": "Credit Card"
+        }
+    }
+}

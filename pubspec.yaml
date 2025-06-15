@@ -1,4 +1,4 @@
-name: invoicing_fe
+name: invoicedaily
 description: "A new Flutter project."
 publish_to: "none"
 
@@ -13,9 +13,16 @@ dependencies:
 
   cupertino_icons: ^1.0.8
   get: ^4.7.2
+  intl:
   shared_preferences: ^2.5.2
   barcode: ^2.1.2
   flutter_svg: ^2.0.7
+
+  # Firebase
+  firebase_core: ^3.13.1
+  firebase_auth: ^5.5.4
+  cloud_firestore: ^5.6.8
+  google_sign_in: ^6.3.0
 
 dev_dependencies:
   flutter_test:
@@ -31,17 +38,6 @@ flutter:
     - assets/flags/
     - assets/icons/
 
-  # An image asset can refer to one or more resolution-specific "variants", see
-  # https://flutter.dev/to/resolution-aware-images
-
-  # For details regarding adding assets from package dependencies, see
-  # https://flutter.dev/to/asset-from-package
-
-  # To add custom fonts to your application, add a fonts section here,
-  # in this "flutter" section. Each entry in this list should have a
-  # "family" key with the font family name, and a "fonts" key with a
-  # list giving the asset and other descriptors for the font. For
-  # example:
   # fonts:
   #   - family: Schyler
   #     fonts:
@@ -53,6 +49,3 @@ flutter:
   #       - asset: fonts/TrajanPro.ttf
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
-  #
-  # For details regarding fonts from package dependencies,
-  # see https://flutter.dev/to/font-from-package

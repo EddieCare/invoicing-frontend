@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "477054082230",
+    "project_id": "invoice-daily-c6e50",
+    "storage_bucket": "invoice-daily-c6e50.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:477054082230:android:d8cd31e778cb8aa8079a17",
+        "android_client_info": {
+          "package_name": "com.invoicedaily.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "477054082230-o7259bf31asjr2ls151bc8u8c9q4v4j9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.invoicedaily.app",
+            "certificate_hash": "1f9f5f477479f2a7d3b9f68b3943808c4d569e2d"
+          }
+        },
+        {
+          "client_id": "477054082230-0cpiqf3jgevrfo92nadtgobn7eoe7pb2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAeH7VP7kyr6IB50xTjb8LxYpCFmNTZiTg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "477054082230-0cpiqf3jgevrfo92nadtgobn7eoe7pb2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

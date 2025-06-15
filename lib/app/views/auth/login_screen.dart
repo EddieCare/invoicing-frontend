@@ -164,19 +164,11 @@ class LoginScreen extends StatelessWidget {
                   isPassword: true,
                 ),
 
-                // const SizedBox(height: 10),
-                // Align(
-                //   alignment: Alignment.centerRight,
-                //   child: TextButton(
-                //     onPressed: () {},
-                //     child: const Text("Forgot Password?"),
-                //   ),
-                // ),
                 const SizedBox(height: 30),
 
                 // Login Button
                 PrimaryButton(
-                  onPressed: () => Get.toNamed(Routes.baseScreen),
+                  onPressed: () => {controller.login()},
                   text: "Login",
                 ),
 

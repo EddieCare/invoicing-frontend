@@ -60,6 +60,7 @@ class NotificationScreen extends StatelessWidget {
       appBar: TopBar(
         title: "Notifications",
         showBackButton: true,
+        showAddInvoice: false,
         actions: [
           // IconButton(icon: Icon(Icons.search, size: 28), onPressed: () {}),
         ],

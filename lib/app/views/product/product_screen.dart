@@ -1,60 +1,92 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:get/get.dart';
 
+import '../../../components/dialogs.dart';
 import '../../../components/top_bar.dart';
-import '../../../components/urgent_notification_card.dart';
 import '../../../values/values.dart';
+import '../../controllers/product/product_controller.dart';
 import '../../routes/app_routes.dart';
 
 class ProductScreen extends StatelessWidget {
-  const ProductScreen({super.key});
+  ProductScreen({super.key});
+  final productController = Get.put(ProductController());
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
-
     return Scaffold(
       backgroundColor: AppColor.pageColor,
       appBar: TopBar(
         title: "Product",
         showBackButton: false,
         showMenu: true,
-        actions: [
-          // Icon(Icons.search_outlined, size: 28),
-          const SizedBox(width: 16),
-        ],
+        actions: const [SizedBox(width: 16)],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            urgentNotificationsCard(),
-            const SizedBox(height: 20),
-            _filterBar(),
-            const SizedBox(height: 20),
-            ..._productCards(context),
-          ],
-        ),
-      ),
+      body: Obx(() {
+        final controller = Get.find<ProductController>();
+
+        return SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // urgentNotificationsCard(),
+              const SizedBox(height: 20),
+              _filterBar(controller),
+              const SizedBox(height: 20),
+              ..._productCards(context, controller.items),
+            ],
+          ),
+        );
+      }),
     );
   }
 
-  Widget _filterBar() {
+  Widget _filterBar(ProductController controller) {
+    final options = ['Product', 'Service'];
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        _filterButton("All", isSelected: true),
         Row(
-          children: [
-            GestureDetector(
-              onTap: () => Get.toNamed(Routes.addProductScreen),
-              child: _filterButton("Add"),
-            ),
-            const SizedBox(width: 5),
-            _filterButton("Sort By"),
-          ],
+          children:
+              options.map((label) {
+                return Padding(
+                  padding: const EdgeInsets.only(right: 6),
+                  child: GestureDetector(
+                    onTap: () => controller.updateFilter(label),
+                    child: _filterButton(
+                      label,
+                      isSelected: controller.selectedFilter.value == label,
+                    ),
+                  ),
+                );
+              }).toList(),
+        ),
+        // GestureDetector(
+        //   onTap: () => Get.toNamed(Routes.addProductScreen),
+        //   child: _filterButton("Add", icon: Icons.add),
+        // ),
+        PopupMenuButton<String>(
+          color: AppColor.themeColor,
+          onSelected: (value) {
+            final isService = value == 'Service';
+            Get.toNamed(
+              Routes.addProductScreen,
+              arguments: {'isService': isService},
+            );
+          },
+          itemBuilder:
+              (context) => [
+                const PopupMenuItem(
+                  value: 'Product',
+                  child: Text('Add Product'),
+                ),
+                const PopupMenuItem(
+                  value: 'Service',
+                  child: Text('Add Service'),
+                ),
+              ],
+          child: _filterButton("Add", icon: Icons.add),
         ),
       ],
     );
@@ -88,15 +120,6 @@ class ProductScreen extends StatelessWidget {
             ),
             const SizedBox(width: 8),
           ],
-          if (label == 'Add') ...[
-            SvgPicture.asset(
-              'assets/icons/box-add.svg',
-              height: 18,
-              width: 18,
-              color: isSelected ? Colors.white : Colors.black,
-            ),
-            const SizedBox(width: 8),
-          ],
           Text(
             label,
             style: TextStyle(
@@ -109,18 +132,14 @@ class ProductScreen extends StatelessWidget {
     );
   }
 
-  List<Widget> _productCards(context) {
-    final List<Map<String, dynamic>> items = [
-      {"stock": 5, "price": 4.99},
-      {"stock": 15, "price": 4.99},
-      {"stock": 150, "price": 4.99},
-      {"stock": 150, "price": 4.99},
-    ];
-
+  List<Widget> _productCards(
+    BuildContext context,
+    List<Map<String, dynamic>> items,
+  ) {
     final screenSize = MediaQuery.of(context).size;
 
     return items.map((item) {
-      final stock = item["stock"];
+      final stock = item["quantity"] ?? 0;
       final isLow = stock < 10;
       final isMedium = stock < 100;
       final stockColor =
@@ -131,7 +150,7 @@ class ProductScreen extends StatelessWidget {
               : Colors.green;
 
       return GestureDetector(
-        onTap: () => Get.toNamed(Routes.viewProductScreen),
+        onTap: () => Get.toNamed(Routes.viewProductScreen, arguments: item),
         child: Container(
           margin: const EdgeInsets.only(bottom: 16),
           padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
@@ -142,20 +161,26 @@ class ProductScreen extends StatelessWidget {
               BoxShadow(
                 color: Colors.grey.shade100,
                 blurRadius: 6,
-                offset: Offset(0, 2),
+                offset: const Offset(0, 2),
               ),
             ],
           ),
           child: IntrinsicHeight(
-            // Make Row take full height of its tallest child
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
                   width: screenSize.width * 0.25,
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
+                    // color: Colors.grey.shade300,
                     borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Image.network(
+                    item["image_link"] ??
+                        "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQyhP--a8Qb3RebW0AR2zNFQxG5Oh9eQsG6Q7gFax_4EkzB4TWFNnyCs2INPHxZGp4FPZ9s_670RIdH89S_D-TAkStBI4R2oQfq4gwEzkeukwCz6xWik8ESxg",
+                    width: 90,
+                    height: 90,
+                    fit: BoxFit.contain,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -163,19 +188,16 @@ class ProductScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width * 0.40,
-                        child: Text(
-                          "Wireless Mouse \nLogiTech".substring(1, 22),
-                          maxLines: 3,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                            height: 1.3,
-                          ),
+                      Text(
+                        item["name"] ?? "No Name",
+                        maxLines: 2,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          height: 1.3,
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 10),
                       Row(
                         children: [
                           const Text(
@@ -186,8 +208,8 @@ class ProductScreen extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            "\$ ${item["price"].toStringAsFixed(2)}",
-                            style: TextStyle(fontSize: 14),
+                            "₹ ${item["price"]?.toStringAsFixed(2) ?? "--"}",
+                            style: const TextStyle(fontSize: 14),
                           ),
                         ],
                       ),
@@ -217,10 +239,37 @@ class ProductScreen extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Icon(Icons.delete_outline, color: Colors.red, size: 24),
-                    const Spacer(), // pushes view details to bottom
+                    GestureDetector(
+                      onTap:
+                          () => {
+                            showDialog(
+                              context: context,
+                              barrierDismissible: true,
+                              builder:
+                                  (_) => ConfirmationDialog(
+                                    title: "Confirm Delete Product",
+                                    message:
+                                        "Are you sure you want to delete this product?",
+                                    onYes: () async {
+                                      productController.deleteProduct(item);
+                                      Navigator.pop(context);
+                                    },
+                                    onNo: () => Navigator.pop(context),
+                                  ),
+                            ),
+                          },
+                      child: Container(
+                        margin: EdgeInsets.all(3),
+                        child: const Icon(
+                          Icons.delete_outline,
+                          color: Colors.red,
+                          size: 24,
+                        ),
+                      ),
+                    ),
+                    const Spacer(),
                     Row(
-                      children: [
+                      children: const [
                         Text(
                           "View Details",
                           style: TextStyle(
@@ -229,7 +278,7 @@ class ProductScreen extends StatelessWidget {
                             fontWeight: FontWeight.w200,
                           ),
                         ),
-                        const SizedBox(width: 6),
+                        SizedBox(width: 6),
                         Icon(
                           Icons.arrow_forward_ios_rounded,
                           color: Colors.black,

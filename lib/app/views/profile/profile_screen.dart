@@ -3,13 +3,16 @@ import 'package:get/get.dart';
 
 import '../../../components/top_bar.dart';
 import '../../../values/values.dart';
+import '../../controllers/auth/auth_controller.dart';
 import '../../controllers/profile/profile_controller.dart';
+import '../../controllers/shop/shop_controller.dart';
 import '../../routes/app_routes.dart';
 
 class ProfileScreen extends StatelessWidget {
   ProfileScreen({super.key});
 
   final ProfileController controller = Get.put(ProfileController());
+  final ShopController shopController = Get.put(ShopController());
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +25,7 @@ class ProfileScreen extends StatelessWidget {
         // leadingIcon: Icon(Icons.settings, size: 30),
         showBackButton: false,
         showMenu: true,
+        showAddInvoice: false,
         actions: [
           Row(
             children: [
@@ -41,11 +45,11 @@ class ProfileScreen extends StatelessWidget {
             ),
             SizedBox(height: 12),
             Text(
-              "Edmond K",
+              controller.vendorData.value?['name'] ?? 'Loading...',
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
             Text(
-              "eddykumaryadav@gmail.com",
+              controller.vendorData.value?['email'] ?? '',
               style: TextStyle(fontSize: 14, color: Colors.grey[700]),
             ),
             SizedBox(height: 10),
@@ -96,19 +100,65 @@ class ProfileScreen extends StatelessWidget {
             _buildSettingsCard(
               context,
               children: [
-                _buildListTile(Icons.security, "Security"),
-                _buildListTile(Icons.receipt_long, "Manage Subscription"),
+                _buildListTile(
+                  Icons.add_business_outlined,
+                  "View Shop",
+                  onTap: () => {shopController.checkAndViewOrCreateShop()},
+                ),
               ],
             ),
+
             _buildSettingsCard(
               context,
               children: [
-                _buildListTile(Icons.support_agent, "Help & Support"),
-                _buildListTile(Icons.chat_bubble_outline, "Contact us"),
-                _buildListTile(Icons.lock_outline, "Privacy policy"),
+                _buildListTile(
+                  Icons.receipt_long,
+                  "Manage Subscription",
+                  onTap: () => {Get.toNamed(Routes.plansScreen)},
+                ),
+                _buildListTile(
+                  Icons.restore_outlined,
+                  "Restore Purchases",
+                  onTap: () => {Get.toNamed(Routes.plansScreen)},
+                ),
+                _buildListTile(
+                  Icons.delete,
+                  "Delete Account",
+                  onTap: () => {Get.toNamed(Routes.plansScreen)},
+                ),
               ],
             ),
-            SizedBox(height: 20),
+
+            _buildSettingsCard(
+              context,
+              children: [_buildListTile(Icons.security, "Security")],
+            ),
+            // Spacer(),
+            SizedBox(height: 10),
+            _buildSettingsCard(
+              context,
+              cardTitle: "About",
+              children: [
+                // _buildListTile(Icons.support_agent, "About"),
+                _buildListTile(
+                  Icons.security,
+                  "App version ${Config.versionCode}",
+                ),
+                // _buildListTile(Icons.support_agent, "Help & Support"),
+                _buildListTile(Icons.chat_bubble_outline, "Contact us"),
+                _buildListTile(Icons.lock_outline, "Privacy policy"),
+                _buildListTile(Icons.terminal_sharp, "Terms of Services"),
+                _buildListTile(
+                  Icons.logout_sharp,
+                  "Logout",
+                  onTap: () async {
+                    await AuthController.to
+                        .signOut(); // Handles Firebase & Google logout
+                  },
+                ),
+              ],
+            ),
+            SizedBox(height: 50),
           ],
         ),
       ),
@@ -117,6 +167,7 @@ class ProfileScreen extends StatelessWidget {
 
   Widget _buildSettingsCard(
     BuildContext context, {
+    String? cardTitle,
     required List<Widget> children,
   }) {
     return Container(
@@ -129,7 +180,21 @@ class ProfileScreen extends StatelessWidget {
           BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
         ],
       ),
-      child: Column(children: children),
+      child: Column(
+        children: [
+          if (cardTitle != null)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.only(left: 20, top: 10, bottom: 10),
+              child: Text(
+                cardTitle ?? "",
+                textAlign: TextAlign.start,
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ...children,
+        ],
+      ),
     );
   }
 

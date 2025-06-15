@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../app/controllers/auth/auth_controller.dart';
 import '../app/controllers/sidebar/sidebar_controller.dart';
 import '../app/routes/app_routes.dart';
 
@@ -101,7 +102,10 @@ class SidebarMenu extends StatelessWidget {
                     SidebarItem(
                       icon: Icons.logout,
                       label: "Logout",
-                      onTap: () => Get.toNamed(Routes.login),
+                      onTap: () async {
+                        await AuthController.to
+                            .signOut(); // Handles Firebase & Google logout
+                      },
                     ),
                     const SizedBox(height: 20),
                   ],

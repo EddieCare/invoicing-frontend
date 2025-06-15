@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:invoicing_fe/values/values.dart';
+
 import '../../../components/dialogs.dart';
 import '../../../components/top_bar.dart';
+import '../../../values/values.dart';
 import '../../controllers/product/product_controller.dart';
 
 class AddProductScreen extends StatelessWidget {
+  // final bool isService;
+  final isService = Get.arguments?['isService'] ?? false;
   AddProductScreen({super.key});
 
   final productController = Get.put(ProductController());
@@ -15,7 +18,7 @@ class AddProductScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColor.pageColor,
       appBar: TopBar(
-        title: "Add Product",
+        title: isService ? "Add Service" : "Add Product",
         showBackButton: true,
         showAddInvoice: false,
       ),
@@ -27,10 +30,13 @@ class AddProductScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildTextField("Name", productController.nameController),
-              _buildTextField(
-                "Stock Keep Unit",
-                productController.skuController,
-              ),
+              _buildTextField("Add an image Link", productController.imageLink),
+
+              if (!isService)
+                _buildTextField(
+                  "Stock Keep Unit",
+                  productController.skuController,
+                ),
               _buildTextField("Brand", productController.brandController),
               _buildDropdown(
                 "Category",
@@ -110,7 +116,12 @@ class AddProductScreen extends StatelessWidget {
               isPrimary: false,
             ),
             const SizedBox(width: 12),
-            _buildButton("Add", onTap: productController.submitForm),
+            _buildButton(
+              isService ? "Add Service" : "Add Product",
+              onTap: () {
+                productController.submitForm(isService: isService);
+              },
+            ),
           ],
         ),
       ),

@@ -2,8 +2,9 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:invoicing_fe/app/controllers/sidebar/sidebar_controller.dart';
-import 'package:invoicing_fe/app/routes/app_routes.dart';
+
+import '../app/controllers/sidebar/sidebar_controller.dart';
+import '../app/routes/app_routes.dart';
 
 class TopBar extends StatelessWidget implements PreferredSizeWidget {
   final Widget? leadingIcon;
@@ -70,11 +71,11 @@ class TopBar extends StatelessWidget implements PreferredSizeWidget {
                     icon: const Icon(Icons.post_add, size: 30),
                     onPressed: () => Get.toNamed(Routes.createInvoice),
                   ),
-                if (showMenu)
-                  IconButton(
-                    icon: const Icon(Icons.menu, size: 30),
-                    onPressed: () => sidebarController.toggleSidebar(),
-                  ),
+                // if (showMenu)
+                //   IconButton(
+                //     icon: const Icon(Icons.menu, size: 30),
+                //     onPressed: () => sidebarController.toggleSidebar(),
+                //   ),
               ],
             ),
           ),

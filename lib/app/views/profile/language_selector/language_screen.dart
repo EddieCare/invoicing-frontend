@@ -36,6 +36,7 @@ class LanguageSelectorView extends StatelessWidget {
         title: "Language",
         showBackButton: true,
         centerTitle: true,
+        showAddInvoice: false,
         actions: [
           TextButton(
             onPressed: () {

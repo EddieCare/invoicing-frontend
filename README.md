@@ -1,6 +1,6 @@
-# invoicing_fe
+# Invoice Daily
 
-A new Flutter project.
+Invoice Daily
 
 ## Getting Started
 

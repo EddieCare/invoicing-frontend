@@ -1,21 +1,50 @@
 import 'package:flutter/material.dart';
-import 'package:invoicing_fe/values/values.dart';
+import 'package:get/get.dart';
+import 'package:invoicedaily/app/routes/app_routes.dart';
+import 'package:invoicedaily/components/urgent_notification_card.dart';
 
 import '../../../components/top_bar.dart';
+import '../../../values/values.dart';
+import '../../controllers/dashboard/dashboard_controller.dart';
+import '../../controllers/shop/shop_controller.dart';
+import '../shop/shop_create.dart';
 
 class DashboardScreen extends StatelessWidget {
+  DashboardScreen({super.key});
+
+  final DashboardController controller = Get.put(DashboardController());
+  final ShopController shopController = Get.put(ShopController());
+
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
+    String _monthName(int month) {
+      const months = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
+      return months[month - 1];
+    }
+
     return Scaffold(
       // extendBodyBehindAppBar: true,
       backgroundColor: AppColor.pageColor,
       appBar: TopBar(
         // title: "Home",
-        leadingIcon: Padding(
-          padding: const EdgeInsets.only(left: 14),
-          child: Icon(Icons.dashboard_customize_outlined, size: 30),
-        ),
+        // leadingIcon: Padding(
+        //   padding: const EdgeInsets.only(left: 14),
+        //   child: Icon(Icons.dashboard_customize_outlined, size: 30),
+        // ),
         showBackButton: false,
         showMenu: true,
         actions: [
@@ -24,163 +53,213 @@ class DashboardScreen extends StatelessWidget {
           // Icon(Icons.menu, size: 30),
         ],
       ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisSize: MainAxisSize.max,
-              children: [
-                const SizedBox(height: 15),
-                SizedBox(
-                  width: screenSize.width * 0.89,
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        "Apr 16, 2025",
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w300,
-                          color: Colors.black,
-                        ),
-                      ),
-                      const SizedBox(height: 6),
-                      Text(
-                        "Dashboard",
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-                informationContainer(screenSize),
-                const SizedBox(height: 24),
-                pendingInvoices(screenSize),
-                const SizedBox(height: 24),
-                Container(
-                  width: screenSize.width * 0.9,
-                  padding: EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-                  decoration: BoxDecoration(
-                    // color: Colors.white70,
-                    borderRadius: BorderRadius.all(Radius.circular(20)),
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Column(
-                        mainAxisSize: MainAxisSize.max,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Financial Overview",
-                            style: TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black,
-                            ),
+      body: Obx(() {
+        if (controller.isLoading.value) {
+          return Center(
+            child: CircularProgressIndicator(color: AppColor.textColorPrimary),
+          );
+        }
+        return SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  const SizedBox(height: 15),
+                  SizedBox(
+                    width: screenSize.width * 0.89,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          // "Apr 16, 2025",
+                          "${DateTime.now().toLocal().day.toString().padLeft(2, '0')} "
+                          "${_monthName(DateTime.now().month)}, "
+                          "${DateTime.now().year}",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w300,
+                            color: Colors.black,
                           ),
-                          Text(
-                            "See All",
-                            style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w200,
-                              color: Colors.black,
-                            ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          "Dashboard",
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
                           ),
-                          const SizedBox(height: 10),
-                          Column(
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    height: screenSize.width * 0.40,
-                                    width: screenSize.width * 0.40,
-                                    decoration: BoxDecoration(
-                                      color: Colors.black,
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(20),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Container(
-                                    height: screenSize.width * 0.40,
-                                    width: screenSize.width * 0.40,
-                                    decoration: BoxDecoration(
-                                      color: const Color.fromARGB(
-                                        255,
-                                        210,
-                                        210,
-                                        210,
-                                      ),
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(20),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 10),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  urgentNotificationsCard(),
+                  const SizedBox(height: 24),
+                  shopController.shopData.value != null
+                      ? _buildShopCard(
+                        shopController.shopData.value!,
+                        screenSize,
+                      )
+                      : _buildCreateShopPrompt(screenSize),
 
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(
-                                    height: screenSize.width * 0.40,
-                                    width: screenSize.width * 0.40,
-                                    decoration: BoxDecoration(
-                                      color: const Color.fromARGB(
-                                        255,
-                                        210,
-                                        210,
-                                        210,
-                                      ),
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(20),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 10),
-                                  Container(
-                                    height: screenSize.width * 0.40,
-                                    width: screenSize.width * 0.40,
-                                    decoration: BoxDecoration(
-                                      color: Colors.black,
-                                      borderRadius: BorderRadius.all(
-                                        Radius.circular(20),
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                  const SizedBox(height: 24),
+                  Container(
+                    width: screenSize.width * 0.9,
+                    padding: EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                    decoration: BoxDecoration(
+                      // color: Colors.white70,
+                      borderRadius: BorderRadius.all(Radius.circular(20)),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        Column(
+                          mainAxisSize: MainAxisSize.max,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Financial Overview",
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black,
                               ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
+                            ),
+                            Text(
+                              "See All",
+                              style: TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w200,
+                                color: Colors.black,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Container(
+                                      height: screenSize.width * 0.40,
+                                      width: screenSize.width * 0.40,
+                                      decoration: BoxDecoration(
+                                        color: Colors.black,
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(20),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Container(
+                                      height: screenSize.width * 0.40,
+                                      width: screenSize.width * 0.40,
+                                      decoration: BoxDecoration(
+                                        color: const Color.fromARGB(
+                                          255,
+                                          210,
+                                          210,
+                                          210,
+                                        ),
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(20),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 10),
+
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Container(
+                                      height: screenSize.width * 0.40,
+                                      width: screenSize.width * 0.40,
+                                      decoration: BoxDecoration(
+                                        color: const Color.fromARGB(
+                                          255,
+                                          210,
+                                          210,
+                                          210,
+                                        ),
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(20),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Container(
+                                      height: screenSize.width * 0.40,
+                                      width: screenSize.width * 0.40,
+                                      decoration: BoxDecoration(
+                                        color: Colors.black,
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(20),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const SizedBox(height: 18),
-                recentInvoices(screenSize),
-                const SizedBox(height: 24),
-              ],
+                  // const SizedBox(height: 18),
+                  // recentInvoices(screenSize),
+                  const SizedBox(height: 24),
+                  pendingInvoices(screenSize),
+                  const SizedBox(height: 24),
+                ],
+              ),
             ),
           ),
+        );
+      }),
+    );
+  }
+
+  Widget _buildCreateShopPrompt(Size screenSize) {
+    return GestureDetector(
+      onTap: () {
+        showCreateShopBottomSheet(
+          Get.context!,
+          // onCreate: (data) {
+          //   controller.createShop(data);
+          // },
+        );
+      },
+      child: Container(
+        width: screenSize.width * 0.9,
+        padding: EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: Colors.orangeAccent,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          children: [
+            Icon(Icons.store, size: 40),
+            const SizedBox(height: 12),
+            Text(
+              "No shop found. Tap to create your shop now!",
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 16),
+            ),
+          ],
         ),
       ),
     );
@@ -400,7 +479,7 @@ class DashboardScreen extends StatelessWidget {
               "Due: 27 March, 2025",
               style: TextStyle(
                 fontSize: 14,
-                fontWeight: FontWeight.w200,
+                fontWeight: FontWeight.w400,
                 color: Colors.red,
               ),
             ),
@@ -409,8 +488,8 @@ class DashboardScreen extends StatelessWidget {
         trailing: Text(
           "4000 AUD",
           style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w500,
+            fontSize: 16,
+            fontWeight: FontWeight.w700,
             color: Colors.black,
           ),
         ),
@@ -418,99 +497,105 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Container informationContainer(Size screenSize) {
-    return Container(
-      width: screenSize.width * 0.9,
-      // height: 400,
-      padding: EdgeInsets.symmetric(vertical: 24, horizontal: 10),
-      decoration: BoxDecoration(
-        color: Colors.black,
-        borderRadius: BorderRadius.all(Radius.circular(20)),
-      ),
-      child: Row(
-        children: [
-          // Container(
-          //   decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
-          //   width: screenSize.width * 0.3,
-          //   child: Image.network(
-          //     "https://blog.boon.so/wp-content/uploads/2024/03/BMW-Logo-3-scaled.jpg",
-          //     width: screenSize.width * 0.2,
-          //     height: screenSize.width * 0.2,
-          //     fit: BoxFit.cover,
-          //   ),
-          // ),
-          Container(
-            width: screenSize.width * 0.28,
-            height: screenSize.width * 0.28, // Make it a square
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20), // Curved border
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(
-                20,
-              ), // Match this with container's radius
-              child: Image.network(
-                "https://blog.boon.so/wp-content/uploads/2024/03/BMW-Logo-3-scaled.jpg",
-                width: screenSize.width * 0.2,
-                height: screenSize.width * 0.2,
-                fit: BoxFit.cover,
+  Widget _buildShopCard(Map<String, dynamic> shopData, Size screenSize) {
+    return GestureDetector(
+      onTap: () => {Get.toNamed(Routes.shopDetailScreen, arguments: shopData)},
+      child: Container(
+        width: screenSize.width * 0.9,
+        // height: 400,
+        padding: EdgeInsets.symmetric(vertical: 24, horizontal: 10),
+        decoration: BoxDecoration(
+          color: Colors.black,
+          borderRadius: BorderRadius.all(Radius.circular(20)),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: screenSize.width * 0.28,
+              height: screenSize.width * 0.28, // Make it a square
+              padding: EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(20), // Curved border
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(
+                  20,
+                ), // Match this with container's radius
+                child:
+                    shopData['shop_image_link'] != null
+                        ? Image.network(
+                          // shopData['shop_image_link'] ?? "assets/images/no_image.png",
+                          shopData['shop_image_link'],
+                          width: screenSize.width * 0.2,
+                          height: screenSize.width * 0.2,
+                          fit: BoxFit.cover,
+                        )
+                        : Image.asset("assets/images/no_image.png"),
               ),
             ),
-          ),
-          const SizedBox(width: 15),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "BMW Motors",
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: Colors.white,
+            const SizedBox(width: 15),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  // "BMW Motors",
+                  shopData["shop_name"] ?? "",
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-              Text(
-                "motormatters@bmw.com",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w300,
-                  color: const Color.fromARGB(255, 181, 181, 181),
+                Text(
+                  // "motormatters@bmw.com",
+                  shopData['shop_email'] ?? "",
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w300,
+                    color: const Color.fromARGB(255, 181, 181, 181),
+                  ),
                 ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                margin: const EdgeInsets.symmetric(vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.blueAccent,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.phone, color: Colors.white, size: 14),
-                    const SizedBox(width: 6),
-                    Text(
-                      "+1 123 456 7890",
-                      style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  margin: const EdgeInsets.symmetric(vertical: 6),
+                  decoration: BoxDecoration(
+                    color: Colors.blueAccent,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.phone, color: Colors.white, size: 14),
+                      const SizedBox(width: 6),
+                      Text(
+                        // "+1 123 456 7890",
+                        shopData['shop_phone'] ?? "",
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              Text(
-                "Mountain View, California",
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w300,
-                  color: const Color.fromARGB(255, 242, 242, 242),
+                Text(
+                  "${shopData['shop_address']['street']}, ${shopData['shop_address']['zip']}" ??
+                      "",
+                  // "Mountain View, California",
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w300,
+                    color: const Color.fromARGB(255, 242, 242, 242),
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:invoicing_fe/values/values.dart';
+
 import '../../../components/top_bar.dart';
+import '../../../values/values.dart';
 
 class InvoicePreviewScreen extends StatelessWidget {
   const InvoicePreviewScreen({super.key});

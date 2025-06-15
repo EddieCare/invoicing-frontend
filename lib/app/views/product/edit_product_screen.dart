@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:invoicing_fe/values/values.dart';
+
 import '../../../components/dialogs.dart';
 import '../../../components/top_bar.dart';
+import '../../../values/values.dart';
 import '../../controllers/product/product_controller.dart';
 
 class EditProductScreen extends StatelessWidget {
