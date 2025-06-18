@@ -10,6 +10,7 @@ class DashboardController extends GetxController {
   var isLoading = false.obs;
 
   String? get uid => _auth.currentUser?.uid;
+  String? get email => _auth.currentUser?.email;
 
   @override
   void onInit() {
@@ -18,13 +19,13 @@ class DashboardController extends GetxController {
   }
 
   Future<void> fetchShopDetails() async {
-    if (uid == null) return;
+    if (email == null) return;
     isLoading.value = true;
 
     final shopCollection =
         await _firestore
             .collection('vendors')
-            .doc(uid)
+            .doc(email)
             .collection('shops')
             .limit(1)
             .get();
@@ -39,11 +40,11 @@ class DashboardController extends GetxController {
   }
 
   Future<void> createShop(Map<String, dynamic> shopDataInput) async {
-    if (uid == null) return;
+    if (email == null) return;
 
     final shopRef = _firestore
         .collection('vendors')
-        .doc(uid)
+        .doc(email)
         .collection('shops');
 
     final newShop = {
@@ -51,7 +52,6 @@ class DashboardController extends GetxController {
       "isActive": true,
       "createdAt": DateTime.now().toIso8601String(),
       "updatedAt": DateTime.now().toIso8601String(),
-      "createdBy": "adminUser_001",
       "vendorId": uid,
     };
 

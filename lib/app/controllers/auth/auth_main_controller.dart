@@ -5,8 +5,6 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 import '../../routes/app_routes.dart';
 
-// class AuthMainController extends GetxController {}
-
 class AuthMainController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -43,7 +41,7 @@ class AuthMainController extends GetxController {
   Future<void> _handleFirstTimeLogin(User? user) async {
     if (user == null) return;
 
-    final doc = await _firestore.collection('vendors').doc(user.uid).get();
+    final doc = await _firestore.collection('vendors').doc(user.email).get();
     if (!doc.exists) {
       // Redirect to business details to complete setup
       Get.offAllNamed(Routes.businessDetails);

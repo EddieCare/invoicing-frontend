@@ -32,17 +32,17 @@ class EditProfileScreen extends StatelessWidget {
               buildTextField(
                 "Full name",
                 controller.fullNameController,
-                "Eddy K",
+                "Full name",
               ),
               buildTextField(
                 "Business Name",
                 controller.businessNameController,
-                "Eddiecare",
+                "Business Name",
               ),
               buildTextField(
                 "Mail",
                 controller.emailController,
-                "youremail@domain.com",
+                "example@mail.com",
               ),
               // buildPhoneField(),
               // const SizedBox(height: 12),
@@ -53,19 +53,14 @@ class EditProfileScreen extends StatelessWidget {
                       () => buildDropdownField(
                         "Country",
                         controller.selectedCountry.value,
-                        ['United States', 'India', 'Canada'],
+                        [
+                          'United States',
+                          'United Kingdom',
+                          'Canada',
+                          'Australia',
+                          'South Africa',
+                        ],
                         (value) => controller.selectedCountry.value = value!,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Obx(
-                      () => buildDropdownField(
-                        "Gender",
-                        controller.selectedGender.value,
-                        ['Male', 'Female', 'Other'],
-                        (value) => controller.selectedGender.value = value!,
                       ),
                     ),
                   ),
@@ -75,7 +70,7 @@ class EditProfileScreen extends StatelessWidget {
               buildTextField(
                 "Address",
                 controller.addressController,
-                "45 New Avenue, New York",
+                "Address",
               ),
               const SizedBox(height: 24),
               buildSubmitButton(controller.handleSubmit, "Submit"),

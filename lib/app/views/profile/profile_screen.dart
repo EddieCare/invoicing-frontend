@@ -75,11 +75,11 @@ class ProfileScreen extends StatelessWidget {
             _buildSettingsCard(
               context,
               children: [
-                _buildListTile(
-                  Icons.edit,
-                  "Edit profile information",
-                  onTap: () => {Get.toNamed(Routes.editProfile)},
-                ),
+                // _buildListTile(
+                //   Icons.edit,
+                //   "Edit profile information",
+                //   onTap: () => {Get.toNamed(Routes.editProfile)},
+                // ),
                 _buildListTile(
                   Icons.notifications_none,
                   "Notifications",
@@ -129,10 +129,6 @@ class ProfileScreen extends StatelessWidget {
               ],
             ),
 
-            _buildSettingsCard(
-              context,
-              children: [_buildListTile(Icons.security, "Security")],
-            ),
             // Spacer(),
             SizedBox(height: 10),
             _buildSettingsCard(

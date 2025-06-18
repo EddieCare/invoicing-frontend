@@ -37,26 +37,19 @@ class DashboardScreen extends StatelessWidget {
     }
 
     return Scaffold(
-      // extendBodyBehindAppBar: true,
       backgroundColor: AppColor.pageColor,
       appBar: TopBar(
-        // title: "Home",
-        // leadingIcon: Padding(
-        //   padding: const EdgeInsets.only(left: 14),
-        //   child: Icon(Icons.dashboard_customize_outlined, size: 30),
-        // ),
         showBackButton: false,
         showMenu: true,
         actions: [
           Icon(Icons.notifications_none, size: 30),
           SizedBox(width: 12),
-          // Icon(Icons.menu, size: 30),
         ],
       ),
       body: Obx(() {
         if (controller.isLoading.value) {
           return Center(
-            child: CircularProgressIndicator(color: AppColor.textColorPrimary),
+            // child: CircularProgressIndicator(color: AppColor.textColorPrimary),
           );
         }
         return SingleChildScrollView(
@@ -99,8 +92,8 @@ class DashboardScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 15),
-                  urgentNotificationsCard(),
+
+                  // const SizedBox(height: 15),
                   const SizedBox(height: 24),
                   shopController.shopData.value != null
                       ? _buildShopCard(
@@ -112,7 +105,7 @@ class DashboardScreen extends StatelessWidget {
                   const SizedBox(height: 24),
                   Container(
                     width: screenSize.width * 0.9,
-                    padding: EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                    padding: EdgeInsets.symmetric(vertical: 24, horizontal: 4),
                     decoration: BoxDecoration(
                       // color: Colors.white70,
                       borderRadius: BorderRadius.all(Radius.circular(20)),
@@ -144,6 +137,8 @@ class DashboardScreen extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 10),
+                            urgentNotificationsCard(),
+                            const SizedBox(height: 18),
                             Column(
                               children: [
                                 Row(
@@ -151,8 +146,8 @@ class DashboardScreen extends StatelessWidget {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Container(
-                                      height: screenSize.width * 0.40,
-                                      width: screenSize.width * 0.40,
+                                      height: screenSize.width * 0.42,
+                                      width: screenSize.width * 0.42,
                                       decoration: BoxDecoration(
                                         color: Colors.black,
                                         borderRadius: BorderRadius.all(
@@ -162,8 +157,8 @@ class DashboardScreen extends StatelessWidget {
                                     ),
                                     const SizedBox(width: 10),
                                     Container(
-                                      height: screenSize.width * 0.40,
-                                      width: screenSize.width * 0.40,
+                                      height: screenSize.width * 0.42,
+                                      width: screenSize.width * 0.42,
                                       decoration: BoxDecoration(
                                         color: const Color.fromARGB(
                                           255,
@@ -185,8 +180,8 @@ class DashboardScreen extends StatelessWidget {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Container(
-                                      height: screenSize.width * 0.40,
-                                      width: screenSize.width * 0.40,
+                                      height: screenSize.width * 0.42,
+                                      width: screenSize.width * 0.42,
                                       decoration: BoxDecoration(
                                         color: const Color.fromARGB(
                                           255,
@@ -201,8 +196,8 @@ class DashboardScreen extends StatelessWidget {
                                     ),
                                     const SizedBox(width: 10),
                                     Container(
-                                      height: screenSize.width * 0.40,
-                                      width: screenSize.width * 0.40,
+                                      height: screenSize.width * 0.42,
+                                      width: screenSize.width * 0.42,
                                       decoration: BoxDecoration(
                                         color: Colors.black,
                                         borderRadius: BorderRadius.all(
@@ -522,15 +517,16 @@ class DashboardScreen extends StatelessWidget {
                   20,
                 ), // Match this with container's radius
                 child:
-                    shopData['shop_image_link'] != null
-                        ? Image.network(
-                          // shopData['shop_image_link'] ?? "assets/images/no_image.png",
-                          shopData['shop_image_link'],
-                          width: screenSize.width * 0.2,
-                          height: screenSize.width * 0.2,
-                          fit: BoxFit.cover,
-                        )
-                        : Image.asset("assets/images/no_image.png"),
+                // shopData['shop_image_link'] != null
+                //     ? Image.network(
+                //       // shopData['shop_image_link'] ?? "assets/images/no_image.png",
+                //       shopData['shop_image_link'],
+                //       width: screenSize.width * 0.2,
+                //       height: screenSize.width * 0.2,
+                //       fit: BoxFit.cover,
+                //     )
+                //     : Image.asset("assets/images/no_image.png"),
+                Image.asset("assets/images/no_image.png"),
               ),
             ),
             const SizedBox(width: 15),

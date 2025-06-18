@@ -1,201 +1,3 @@
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:flutter/material.dart';
-// import 'package:get/get.dart';
-
-// class ProductController extends GetxController {
-//   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-//   final String uid = 'your_vendor_uid'; // Replace with actual logic
-//   final RxString selectedFilter = 'All'.obs;
-
-//   RxList<Map<String, dynamic>> items = <Map<String, dynamic>>[].obs;
-
-//   // Form Controllers
-//   final formKey = GlobalKey<FormState>();
-//   final nameController = TextEditingController();
-//   final skuController = TextEditingController();
-//   final brandController = TextEditingController();
-//   final quantityController = TextEditingController();
-//   final unitTypeController = TextEditingController();
-//   final priceController = TextEditingController();
-//   final notesController = TextEditingController();
-//   final supplierNameController = TextEditingController();
-//   final supplierAddressController = TextEditingController();
-//   final supplierContactController = TextEditingController();
-
-//   final RxString selectedCategory = ''.obs;
-//   final RxString selectedStatus = ''.obs;
-//   final List<String> categoryOptions = ['Electronics', 'Grocery'];
-//   final List<String> statusOptions = ['Active', 'Inactive'];
-
-//   void resetForm() {
-//     nameController.clear();
-//     skuController.clear();
-//     brandController.clear();
-//     quantityController.clear();
-//     unitTypeController.clear();
-//     priceController.clear();
-//     notesController.clear();
-//     supplierNameController.clear();
-//     supplierAddressController.clear();
-//     supplierContactController.clear();
-//     selectedCategory.value = '';
-//     selectedStatus.value = '';
-//   }
-
-//   void submitForm() async {
-//     if (!formKey.currentState!.validate()) return;
-
-//     final isProduct =
-//         selectedFilter.value == 'Product' || selectedFilter.value == 'All';
-
-//     final docRef =
-//         await _firestore
-//             .collection('vendors')
-//             .doc(uid)
-//             .collection('shops')
-//             .limit(1)
-//             .get();
-
-//     if (docRef.docs.isEmpty) return;
-
-//     final shopId = docRef.docs.first.id;
-//     final targetCollection = isProduct ? 'products' : 'services';
-
-//     print("Called and fetching ---------------> " + targetCollection);
-
-//     await _firestore
-//         .collection('vendors')
-//         .doc(uid)
-//         .collection('shops')
-//         .doc(shopId)
-//         .collection(targetCollection)
-//         .add({
-//           'name': nameController.text,
-//           'sku': skuController.text,
-//           'brand': brandController.text,
-//           'category': selectedCategory.value,
-//           'quantity': int.tryParse(quantityController.text) ?? 0,
-//           'status': selectedStatus.value,
-//           'unit_type': unitTypeController.text,
-//           'price': double.tryParse(priceController.text) ?? 0.0,
-//           'notes': notesController.text,
-//           'supplier': {
-//             'name': supplierNameController.text,
-//             'address': supplierAddressController.text,
-//             'contact': supplierContactController.text,
-//           },
-//           'created_at': Timestamp.now(),
-//         });
-
-//     resetForm();
-//     Get.back();
-//     fetchItems(); // Refresh list
-//   }
-
-//   //   void submitForm({bool isService = false}) async {
-//   //   if (!formKey.currentState!.validate()) return;
-
-//   //   final uid = FirebaseAuth.instance.currentUser?.uid;
-//   //   if (uid == null || selectedShopId == null) return;
-
-//   //   final collection = isService ? 'services' : 'products';
-
-//   //   final itemData = {
-//   //     'name': nameController.text.trim(),
-//   //     'sku': skuController.text.trim(),
-//   //     'brand': brandController.text.trim(),
-//   //     'category': selectedCategory.value,
-//   //     'quantity': int.tryParse(quantityController.text.trim()) ?? 0,
-//   //     'status': selectedStatus.value,
-//   //     'unit_type': unitTypeController.text.trim(),
-//   //     'price': double.tryParse(priceController.text.trim()) ?? 0.0,
-//   //     'notes': notesController.text.trim(),
-//   //     'supplier_name': supplierNameController.text.trim(),
-//   //     'supplier_address': supplierAddressController.text.trim(),
-//   //     'supplier_contact': supplierContactController.text.trim(),
-//   //     'created_at': FieldValue.serverTimestamp(),
-//   //   };
-
-//   //   // Remove SKU if it's a service
-//   //   if (isService) itemData.remove('sku');
-
-//   //   try {
-//   //     await FirebaseFirestore.instance
-//   //         .collection('vendors')
-//   //         .doc(uid)
-//   //         .collection('shops')
-//   //         .doc(selectedShopId)
-//   //         .collection(collection)
-//   //         .add(itemData);
-
-//   //     Get.snackbar(
-//   //       "Success",
-//   //       isService ? "Service added successfully!" : "Product added successfully!",
-//   //       snackPosition: SnackPosition.BOTTOM,
-//   //     );
-//   //     resetForm();
-//   //     Get.back(); // Close the form screen
-//   //   } catch (e) {
-//   //     Get.snackbar("Error", "Failed to add ${isService ? 'service' : 'product'}: $e",
-//   //         snackPosition: SnackPosition.BOTTOM);
-//   //   }
-//   // }
-
-//   void fetchItems() async {
-//     final docRef =
-//         await _firestore
-//             .collection('vendors')
-//             .doc(uid)
-//             .collection('shops')
-//             .limit(1)
-//             .get();
-
-//     if (docRef.docs.isEmpty) return;
-
-//     final shopId = docRef.docs.first.id;
-//     items.clear();
-
-//     if (selectedFilter.value == 'Product' || selectedFilter.value == 'All') {
-//       final productSnap =
-//           await _firestore
-//               .collection('vendors')
-//               .doc(uid)
-//               .collection('shops')
-//               .doc(shopId)
-//               .collection('products')
-//               .get();
-//       items.addAll(productSnap.docs.map((e) => e.data()).toList());
-//     }
-
-//     if (selectedFilter.value == 'Service' || selectedFilter.value == 'All') {
-//       final serviceSnap =
-//           await _firestore
-//               .collection('vendors')
-//               .doc(uid)
-//               .collection('shops')
-//               .doc(shopId)
-//               .collection('services')
-//               .get();
-//       items.addAll(serviceSnap.docs.map((e) => e.data()).toList());
-//     }
-
-//     print("Items ---------> ${items}");
-
-//     update(); // for GetBuilder
-//   }
-
-//   void updateFilter(String filter) {
-//     selectedFilter.value = filter;
-//     fetchItems();
-//   }
-
-//   @override
-//   void onInit() {
-//     fetchItems();
-//     super.onInit();
-//   }
-// }
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -252,12 +54,12 @@ class ProductController extends GetxController {
       return;
     }
 
-    final uid = user.uid;
+    final email = user.email;
 
     final shopSnapshot =
         await _firestore
             .collection('vendors')
-            .doc(uid)
+            .doc(email)
             .collection('shops')
             .limit(1)
             .get();
@@ -270,7 +72,7 @@ class ProductController extends GetxController {
     final shopId = shopSnapshot.docs.first.id;
     final collection = isService ? 'services' : 'products';
 
-    print("Product =--=-=-=-=-=-=> $uid, $shopId, $collection ");
+    print("Product =--=-=-=-=-=-=> $email, $shopId, $collection ");
     final itemData = {
       'name': nameController.text.trim(),
       'image_link': imageLink.text.trim(),
@@ -300,7 +102,7 @@ class ProductController extends GetxController {
     try {
       await _firestore
           .collection('vendors')
-          .doc(uid)
+          .doc(email)
           .collection('shops')
           .doc(shopId)
           .collection(collection)
@@ -330,12 +132,12 @@ class ProductController extends GetxController {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
-    final uid = user.uid;
+    final email = user.email;
 
     final shopSnapshot =
         await _firestore
             .collection('vendors')
-            .doc(uid)
+            .doc(email)
             .collection('shops')
             .limit(1)
             .get();
@@ -349,7 +151,7 @@ class ProductController extends GetxController {
       final productSnap =
           await _firestore
               .collection('vendors')
-              .doc(uid)
+              .doc(email)
               .collection('shops')
               .doc(shopId)
               .collection('products')
@@ -362,7 +164,7 @@ class ProductController extends GetxController {
       final serviceSnap =
           await _firestore
               .collection('vendors')
-              .doc(uid)
+              .doc(email)
               .collection('shops')
               .doc(shopId)
               .collection('services')
@@ -376,12 +178,12 @@ class ProductController extends GetxController {
 
   void deleteProduct(Map<String, dynamic> item) async {
     try {
-      final uid = FirebaseAuth.instance.currentUser!.uid;
+      final email = FirebaseAuth.instance.currentUser!.email;
       final shopId = item["shopId"]; // Implement this based on your logic
-      print(shopId + "------" + uid + "------------------");
+      print(shopId + "------" + email + "------------------");
       await FirebaseFirestore.instance
           .collection("vendors")
-          .doc(uid)
+          .doc(email)
           .collection("shops")
           .doc(shopId)
           .collection(item["type"] == "product" ? "products" : "services")

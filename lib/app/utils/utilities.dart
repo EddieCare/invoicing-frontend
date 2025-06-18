@@ -131,7 +131,7 @@ Widget buildSubmitButton(VoidCallback onPressed, String buttonText) {
   return SizedBox(
     width: double.infinity,
     child: ElevatedButton(
-      onPressed: onPressed,
+      onPressed: () => onPressed(),
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.black,
         padding: const EdgeInsets.symmetric(vertical: 16),

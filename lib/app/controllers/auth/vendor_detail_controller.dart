@@ -16,8 +16,9 @@ class VendorDetailsController extends GetxController {
   final registrationController = TextEditingController();
   final categoryController = TextEditingController();
   final businessTypeController = TextEditingController();
-  final firstNameController = TextEditingController();
-  final lastNameController = TextEditingController();
+  final fullNameController = TextEditingController();
+  // final firstNameController = TextEditingController();
+  // final lastNameController = TextEditingController();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -38,8 +39,9 @@ class VendorDetailsController extends GetxController {
       final lastName =
           nameParts.length > 1 ? nameParts.sublist(1).join(" ") : '';
 
-      firstNameController.text = firstName;
-      lastNameController.text = lastName;
+      fullNameController.text = "$firstName $lastName";
+      // firstNameController.text = firstName;
+      // lastNameController.text = lastName;
     }
   }
 
@@ -52,11 +54,13 @@ class VendorDetailsController extends GetxController {
     }
 
     final uid = user.uid;
+    final email = user.email;
 
     final vendorData = {
       "uid": uid,
-      "firstName": firstNameController.text.trim(),
-      "lastName": lastNameController.text.trim(),
+      "fullName": fullNameController.text.trim(),
+      // "firstName": firstNameController.text.trim(),
+      // "lastName": lastNameController.text.trim(),
       "name": nameController.text.trim(),
       "email": emailController.text.trim(),
       "phone": phoneController.text.trim(),
@@ -78,7 +82,7 @@ class VendorDetailsController extends GetxController {
     };
 
     try {
-      await _firestore.collection("vendors").doc(uid).set(vendorData);
+      await _firestore.collection("vendors").doc(email).set(vendorData);
       Get.snackbar("Success", "Vendor details saved");
       Get.toNamed(Routes.baseScreen);
     } catch (e) {

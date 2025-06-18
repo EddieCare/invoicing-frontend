@@ -41,8 +41,9 @@ class ShopDetailScreen extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: Image.network(
-                  shopData['shop_image_link'] ??
-                      'https://img.freepik.com/premium-vector/isolated-cartoon-vector-store-building-front-icon_1138841-28041.jpg',
+                  // shopData['shop_image_link'] ??
+                  //     'https://img.freepik.com/premium-vector/isolated-cartoon-vector-store-building-front-icon_1138841-28041.jpg',
+                  'https://img.freepik.com/premium-vector/isolated-cartoon-vector-store-building-front-icon_1138841-28041.jpg',
                   height: 200,
                   width: MediaQuery.of(context).size.width * 0.9,
 

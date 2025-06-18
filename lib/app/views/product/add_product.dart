@@ -30,6 +30,7 @@ class AddProductScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildTextField("Name", productController.nameController),
+              // TODO: Gallery or capture and upload
               _buildTextField("Add an image Link", productController.imageLink),
 
               if (!isService)
@@ -37,28 +38,31 @@ class AddProductScreen extends StatelessWidget {
                   "Stock Keep Unit",
                   productController.skuController,
                 ),
-              _buildTextField("Brand", productController.brandController),
+              if (!isService)
+                _buildTextField("Brand", productController.brandController),
               _buildDropdown(
                 "Category",
                 productController.selectedCategory,
                 productController.categoryOptions,
               ),
-              _buildTextField(
-                "Quantity",
-                productController.quantityController,
-                isNumber: true,
-              ),
+              if (!isService)
+                _buildTextField(
+                  "Quantity",
+                  productController.quantityController,
+                  isNumber: true,
+                ),
               _buildDropdown(
                 "Status",
                 productController.selectedStatus,
                 productController.statusOptions,
               ),
+              if (!isService)
+                _buildTextField(
+                  "Unit Type",
+                  productController.unitTypeController,
+                ),
               _buildTextField(
-                "Unit Type",
-                productController.unitTypeController,
-              ),
-              _buildTextField(
-                "Price",
+                !isService ? "Price" : "Price per hour",
                 productController.priceController,
                 isNumber: true,
               ),
@@ -68,20 +72,27 @@ class AddProductScreen extends StatelessWidget {
                 maxLines: 3,
               ),
               const SizedBox(height: 24),
-              const Text(
-                "Supplier Details*",
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-              ),
-              const SizedBox(height: 20),
-              _buildTextField("Name", productController.supplierNameController),
-              _buildTextField(
-                "Address",
-                productController.supplierAddressController,
-              ),
-              _buildTextField(
-                "Contact",
-                productController.supplierContactController,
-              ),
+              if (!isService)
+                const Text(
+                  "Supplier Details*",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+              if (!isService) const SizedBox(height: 20),
+              if (!isService)
+                _buildTextField(
+                  "Name",
+                  productController.supplierNameController,
+                ),
+              if (!isService)
+                _buildTextField(
+                  "Address",
+                  productController.supplierAddressController,
+                ),
+              if (!isService)
+                _buildTextField(
+                  "Contact",
+                  productController.supplierContactController,
+                ),
               const SizedBox(height: 24),
             ],
           ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../components/top_bar.dart';
+import '../../../components/urgent_notification_card.dart';
 import '../../../values/values.dart';
 import '../../routes/app_routes.dart';
 
@@ -29,6 +30,62 @@ class InvoiceScreen extends StatelessWidget {
       body: Column(
         children: [
           const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.all(14.0),
+
+            child: Container(
+              decoration: BoxDecoration(boxShadow: [
+                ],
+              ),
+              child: Container(
+                padding: const EdgeInsets.all(16),
+                // margin: const EdgeInsets.symmetric(horizontal: 15),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.grey.shade200, width: 2),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.warning_rounded, color: Colors.red, size: 40),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: const [
+                          Text(
+                            "0 Invoices left!",
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text.rich(
+                            TextSpan(
+                              text: "Consider upgrading to our ",
+                              style: TextStyle(fontSize: 13),
+                              children: [
+                                TextSpan(
+                                  text: "premium",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.red,
+                                  ),
+                                ),
+                                TextSpan(text: " plans"),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 18),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             children: const [

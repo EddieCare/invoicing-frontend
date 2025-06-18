@@ -130,12 +130,8 @@ class BusinessDetailScreen extends StatelessWidget {
               infoSection(context),
               const SizedBox(height: 20),
               CustomTextField(
-                label: "First Name*",
-                controller: controller.firstNameController,
-              ),
-              CustomTextField(
-                label: "Last Name*",
-                controller: controller.lastNameController,
+                label: "Full Name*",
+                controller: controller.fullNameController,
               ),
               CustomTextField(
                 label: "Business Name*",
@@ -150,7 +146,7 @@ class BusinessDetailScreen extends StatelessWidget {
                 controller: controller.phoneController,
               ),
               CustomTextField(
-                label: "Street Address*",
+                label: "Street Address",
                 controller: controller.streetController,
               ),
               CustomTextField(
@@ -170,9 +166,10 @@ class BusinessDetailScreen extends StatelessWidget {
                 controller: controller.countryController,
               ),
               CustomTextField(
-                label: "Company Registration Number*",
+                label: "Company Registration Number",
                 controller: controller.registrationController,
               ),
+              // TODO: Fetch from config/dynamic_content/categories
               CustomTextField(
                 label: "Business Category*",
                 controller: controller.categoryController,
@@ -181,6 +178,7 @@ class BusinessDetailScreen extends StatelessWidget {
                 label: "Business Type*",
                 controller: controller.businessTypeController,
               ),
+
               const SizedBox(height: 30),
               PrimaryButton(
                 text: "Submit",
