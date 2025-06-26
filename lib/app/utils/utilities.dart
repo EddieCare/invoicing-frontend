@@ -127,20 +127,52 @@ Widget buildPhoneField() {
   );
 }
 
-Widget buildSubmitButton(VoidCallback onPressed, String buttonText) {
+// Widget buildSubmitButton(VoidCallback onPressed, String buttonText) {
+//   return SizedBox(
+//     width: double.infinity,
+//     child: ElevatedButton(
+//       onPressed: () => onPressed(),
+//       style: ElevatedButton.styleFrom(
+//         backgroundColor: Colors.black,
+//         padding: const EdgeInsets.symmetric(vertical: 16),
+//         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+//       ),
+//       child: Text(
+//         buttonText,
+//         style: TextStyle(color: Colors.white, fontSize: 16),
+//       ),
+//     ),
+//   );
+// }
+
+Widget buildSubmitButton({
+  required VoidCallback onPressed,
+  required String buttonText,
+  required bool? isLoading,
+}) {
   return SizedBox(
     width: double.infinity,
     child: ElevatedButton(
-      onPressed: () => onPressed(),
+      onPressed: isLoading! ? null : onPressed,
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.black,
         padding: const EdgeInsets.symmetric(vertical: 16),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
-      child: Text(
-        buttonText,
-        style: TextStyle(color: Colors.white, fontSize: 16),
-      ),
+      child:
+          isLoading
+              ? const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
+                  strokeWidth: 2.5,
+                ),
+              )
+              : Text(
+                buttonText,
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+              ),
     ),
   );
 }

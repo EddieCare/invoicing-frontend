@@ -66,14 +66,14 @@ class EditProfileScreen extends StatelessWidget {
                   ),
                 ],
               ),
-              const SizedBox(height: 12),
-              buildTextField(
-                "Address",
-                controller.addressController,
-                "Address",
-              ),
               const SizedBox(height: 24),
-              buildSubmitButton(controller.handleSubmit, "Submit"),
+              Obx(
+                () => buildSubmitButton(
+                  onPressed: controller.handleSubmit,
+                  buttonText: "Submit",
+                  isLoading: controller.btnLoading.value,
+                ),
+              ),
             ],
           ),
         ),
