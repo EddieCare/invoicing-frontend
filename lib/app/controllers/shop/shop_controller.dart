@@ -13,6 +13,7 @@ class ShopController extends GetxController {
   var isLoading = false.obs;
 
   String? get uid => _auth.currentUser?.uid;
+  String? get email => _auth.currentUser?.email;
 
   @override
   void onInit() {
@@ -22,7 +23,7 @@ class ShopController extends GetxController {
 
   /// Fetch the first shop associated with the current vendor
   Future<void> fetchShopDetails() async {
-    if (uid == null) return;
+    if (email == null) return;
 
     try {
       isLoading.value = true;
@@ -30,7 +31,7 @@ class ShopController extends GetxController {
       final shopSnapshot =
           await _firestore
               .collection('vendors')
-              .doc(uid)
+              .doc(email)
               .collection('shops')
               .limit(1)
               .get();
@@ -49,12 +50,12 @@ class ShopController extends GetxController {
 
   /// Create a shop for the current vendor if none exists
   Future<void> createShop(Map<String, dynamic> data) async {
-    if (uid == null) return;
+    if (email == null) return;
 
     try {
       final shopRef = _firestore
           .collection('vendors')
-          .doc(uid)
+          .doc(email)
           .collection('shops');
 
       // Prevent duplicate shop creation
@@ -87,12 +88,12 @@ class ShopController extends GetxController {
 
   /// Used by profile or dashboard to navigate or trigger shop creation
   Future<void> checkAndViewOrCreateShop() async {
-    if (uid == null) return;
+    if (uid == null || email == null) return;
 
     final shopCollection =
         await _firestore
             .collection('vendors')
-            .doc(uid)
+            .doc(email)
             .collection('shops')
             .get();
 

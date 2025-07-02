@@ -1,201 +1,5 @@
-// import 'package:get/get.dart';
-
-// class InvoiceController extends GetxController {
-//   RxList invoices = [].obs;
-//   RxBool hasDiscount = false.obs;
-//   RxInt discountAmt = 0.obs;
-
-//   void updateDiscount() {
-//     hasDiscount.value = !hasDiscount.value;
-//     discountAmt.value = !hasDiscount.value ? 0 : discountAmt.value;
-//   }
-
-//   void updateDiscountAmt(newValue) {
-//     discountAmt.value = int.parse(newValue);
-//   }
-
-//   void completeOnboarding() {
-//     // Logic to mark onboarding as complete
-//   }
-// }
-
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:get/get.dart';
-
-// class InvoiceController extends GetxController {
-//   RxList<Map<String, dynamic>> selectedProducts = <Map<String, dynamic>>[].obs;
-//   RxList<Map<String, dynamic>> selectedServices = <Map<String, dynamic>>[].obs;
-//   RxMap<String, dynamic> clientDetails = <String, dynamic>{}.obs;
-//   RxBool hasDiscount = false.obs;
-//   RxInt discountAmt = 0.obs;
-//   RxString invoiceNumber = ''.obs;
-//   Rx<DateTime> issueDate = DateTime.now().obs;
-//   Rx<DateTime> dueDate = DateTime.now().obs;
-
-//   Future<void> fetchAndSetInvoiceNumber() async {
-//     final uid = FirebaseAuth.instance.currentUser?.uid;
-//     if (uid == null) return;
-
-//     final shopSnap =
-//         await FirebaseFirestore.instance
-//             .collection('vendors')
-//             .doc(uid)
-//             .collection('shops')
-//             .limit(1)
-//             .get();
-//     if (shopSnap.docs.isEmpty) return;
-//     final shopId = shopSnap.docs.first.id;
-
-//     final invoices =
-//         await FirebaseFirestore.instance
-//             .collection('vendors')
-//             .doc(uid)
-//             .collection('shops')
-//             .doc(shopId)
-//             .collection('invoices')
-//             .orderBy('created_at', descending: true)
-//             .limit(1)
-//             .get();
-
-//     String newInvoiceNumber;
-//     if (invoices.docs.isNotEmpty) {
-//       final lastNumber = invoices.docs.first.data()['invoice_number'];
-//       newInvoiceNumber = _generateNextInvoiceNumber(lastNumber);
-//     } else {
-//       newInvoiceNumber = _generateNextInvoiceNumber(null);
-//     }
-
-//     invoiceNumber.value = newInvoiceNumber;
-//   }
-
-//   String _generateNextInvoiceNumber(String? lastInvoice) {
-//     final today = DateTime.now();
-//     final datePrefix =
-//         "${today.year}${today.month.toString().padLeft(2, '0')}${today.day.toString().padLeft(2, '0')}";
-//     final prefix = "INV-$datePrefix-";
-
-//     if (lastInvoice != null && lastInvoice.startsWith(prefix)) {
-//       final lastSeq = int.parse(lastInvoice.split("-").last);
-//       return "$prefix${(lastSeq + 1).toString().padLeft(3, '0')}";
-//     } else {
-//       return "prefix001";
-//     }
-//   }
-
-//   void updateDiscount() {
-//     hasDiscount.value = !hasDiscount.value;
-//     if (!hasDiscount.value) discountAmt.value = 0;
-//   }
-
-//   void updateDiscountAmt(String newValue) {
-//     discountAmt.value = int.tryParse(newValue) ?? 0;
-//   }
-
-//   void setClient(Map<String, dynamic> client) {
-//     clientDetails.value = client;
-//   }
-
-//   Future<void> saveInvoice() async {
-//     final uid = FirebaseAuth.instance.currentUser?.uid;
-//     if (uid == null) return;
-
-//     final shopSnap =
-//         await FirebaseFirestore.instance
-//             .collection('vendors')
-//             .doc(uid)
-//             .collection('shops')
-//             .limit(1)
-//             .get();
-//     if (shopSnap.docs.isEmpty) return;
-//     final shopId = shopSnap.docs.first.id;
-
-//     double subtotal = 0.0;
-//     List<Map<String, dynamic>> items = [];
-
-//     for (var item in [...selectedProducts, ...selectedServices]) {
-//       subtotal += item['price'] * (item['quantity'] ?? 1);
-//       items.add(item);
-//     }
-
-//     double discount =
-//         hasDiscount.value ? (subtotal * discountAmt.value / 100) : 0;
-//     double tax = subtotal * 0.08;
-//     double total = subtotal - discount + tax;
-
-//     final invoiceData = {
-//       "invoice_number": invoiceNumber.value,
-//       "issue_date": Timestamp.fromDate(issueDate.value),
-//       "due_date": Timestamp.fromDate(dueDate.value),
-//       "products": selectedProducts,
-//       "services": selectedServices,
-//       "client": clientDetails,
-//       "subtotal": subtotal,
-//       "discount_percent": discountAmt.value,
-//       "discount_amount": discount,
-//       "tax": tax,
-//       "total": total,
-//       "created_at": FieldValue.serverTimestamp(),
-//     };
-
-//     await FirebaseFirestore.instance
-//         .collection('vendors')
-//         .doc(uid)
-//         .collection('shops')
-//         .doc(shopId)
-//         .collection('invoices')
-//         .add(invoiceData);
-
-//     Get.snackbar("Success", "Invoice created successfully");
-//     clearInvoice();
-//   }
-
-//   void addClient(String name, String email, String phone) async {
-//     final uid = FirebaseAuth.instance.currentUser?.uid;
-//     if (uid == null) return;
-
-//     final shopSnap =
-//         await FirebaseFirestore.instance
-//             .collection('vendors')
-//             .doc(uid)
-//             .collection('shops')
-//             .limit(1)
-//             .get();
-//     if (shopSnap.docs.isEmpty) return;
-//     final shopId = shopSnap.docs.first.id;
-
-//     final newClient = {
-//       "name": name,
-//       "email": email,
-//       "phone": phone,
-//       "created_at": FieldValue.serverTimestamp(),
-//     };
-
-//     final clientRef = await FirebaseFirestore.instance
-//         .collection('vendors')
-//         .doc(uid)
-//         .collection('shops')
-//         .doc(shopId)
-//         .collection('clients')
-//         .add(newClient);
-
-//     InvoiceController controller = Get.find();
-//     controller.setClient({...newClient, "id": clientRef.id});
-//   }
-
-//   void clearInvoice() {
-//     selectedProducts.clear();
-//     selectedServices.clear();
-//     clientDetails.clear();
-//     hasDiscount.value = false;
-//     discountAmt.value = 0;
-//     fetchAndSetInvoiceNumber();
-//   }
-// }
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
@@ -211,9 +15,16 @@ class InvoiceController extends GetxController {
   RxList<Map<String, dynamic>> selectedProducts = <Map<String, dynamic>>[].obs;
   RxList<Map<String, dynamic>> selectedServices = <Map<String, dynamic>>[].obs;
 
+  double TAX_RATE = 0.18; // 18% GST
+  RxDouble subTotal = 0.0.obs;
   RxBool hasDiscount = false.obs;
+  RxDouble discountRate = 0.0.obs;
   RxDouble discountAmt = 0.0.obs;
+  RxDouble totalAmt = 0.0.obs;
+  RxDouble tax = 0.0.obs;
 
+  final RxList<Map<String, dynamic>> searchResults =
+      <Map<String, dynamic>>[].obs;
   Rxn<Map<String, dynamic>> selectedClient = Rxn<Map<String, dynamic>>();
 
   String vendorId = ''; // Set this from the calling screen or auth
@@ -224,27 +35,50 @@ class InvoiceController extends GetxController {
     super.onInit();
     generateInvoiceNumber();
     fetchProductsAndServices();
+    updateTotals();
+  }
+
+  void updateTotals() {
+    double subtotal = 0.0;
+
+    for (final item in selectedProducts) {
+      final qty = item['quantity'] ?? 1;
+      final price = item['price'] ?? 0;
+      subtotal += price * qty;
+    }
+
+    for (final item in selectedServices) {
+      final qty = item['quantity'] ?? 1;
+      final price = item['price'] ?? 0;
+      subtotal += price * qty;
+    }
+
+    subTotal.value = subtotal;
+    tax.value = subtotal * TAX_RATE;
+    totalAmt.value =
+        subtotal - (hasDiscount.value ? (discountAmt.value) : 0) + tax.value;
   }
 
   Future<void> fetchProductsAndServices() async {
-    final uid = FirebaseAuth.instance.currentUser?.uid;
+    final email = FirebaseAuth.instance.currentUser?.email;
+    vendorId = email ?? '';
     try {
       final shopSnapshot =
           await _db
               .collection('vendors')
-              .doc(uid)
+              .doc(email)
               .collection('shops')
               .limit(1)
               .get();
 
       if (shopSnapshot.docs.isEmpty) return;
 
-      final shopId = shopSnapshot.docs.first.id;
+      shopId = shopSnapshot.docs.first.id;
 
       final productsSnapshot =
           await _db
               .collection('vendors')
-              .doc(uid)
+              .doc(email)
               .collection('shops')
               .doc(shopId)
               .collection('products')
@@ -253,7 +87,7 @@ class InvoiceController extends GetxController {
       final servicesSnapshot =
           await _db
               .collection('vendors')
-              .doc(uid)
+              .doc(email)
               .collection('shops')
               .doc(shopId)
               .collection('services')
@@ -274,55 +108,125 @@ class InvoiceController extends GetxController {
     final now = DateTime.now();
     final formatted = DateFormat('yyyyMMdd').format(now);
     final rand = DateTime.now().millisecondsSinceEpoch % 1000;
-    invoiceNumber.value = 'INV-$formatted-${rand.toString().padLeft(3, '0')}';
+    invoiceNumber.value = 'DINV-$formatted-${rand.toString().padLeft(3, '0')}';
   }
 
-  void updateDiscount() => hasDiscount.value = !hasDiscount.value;
+  void updateDiscount() => {
+    updateDiscountRate(discountRate.value.toString()),
+    hasDiscount.value = !hasDiscount.value,
+    updateTotals(),
+  };
 
-  void updateDiscountAmt(String value) {
-    discountAmt.value = double.tryParse(value) ?? 0.0;
+  void updateDiscountRate(String value) {
+    discountRate.value = double.tryParse(value) ?? 0.0;
+    if (hasDiscount.value) {
+      discountAmt.value = subTotal.value * (discountRate.value / 100);
+    } else {
+      discountAmt.value = 0.0;
+    }
+    updateTotals();
   }
 
   void setIssueDate(DateTime date) => issueDate.value = date;
   void setDueDate(DateTime date) => dueDate.value = date;
 
   Future<void> addProduct(Map<String, dynamic> product) async {
-    selectedProducts.add(product);
+    final index = selectedProducts.indexWhere((p) => p['id'] == product['id']);
+
+    if (index >= 0) {
+      final current = selectedProducts[index];
+      final newQty = (product['quantity'] ?? 1);
+      selectedProducts[index] = {...current, 'quantity': newQty};
+    } else {
+      selectedProducts.add({...product, 'quantity': product['quantity'] ?? 1});
+    }
+
+    updateTotals();
   }
 
   Future<void> addService(Map<String, dynamic> service) async {
-    selectedServices.add(service);
+    final index = selectedServices.indexWhere((s) => s['id'] == service['id']);
+
+    if (index >= 0) {
+      final current = selectedServices[index];
+      final newQty = (service['quantity'] ?? 1);
+      selectedServices[index] = {...current, 'quantity': newQty};
+    } else {
+      selectedServices.add({...service, 'quantity': service['quantity'] ?? 1});
+    }
+
+    updateTotals();
   }
 
   Future<void> removeProduct(Map<String, dynamic> product) async {
-    selectedProducts.remove(product);
+    selectedProducts.removeWhere((p) => p['id'] == product['id']);
+    updateTotals();
   }
 
   Future<void> removeService(Map<String, dynamic> service) async {
-    selectedServices.remove(service);
+    selectedServices.removeWhere((s) => s['id'] == service['id']);
+    updateTotals();
   }
 
-  Future<void> setClientBySearch(String nameOrEmailOrPhone) async {
+  Future<void> setClientBySearch(String input) async {
+    final email = FirebaseAuth.instance.currentUser?.email;
+    searchResults.clear();
+    final ref = _db
+        .collection('vendors')
+        .doc(email)
+        .collection('shops')
+        .doc(shopId)
+        .collection('clients');
+
     final query =
-        await _db
-            .collection('vendors')
-            .doc(vendorId)
-            .collection('shops')
-            .doc(shopId)
-            .collection('clients')
+        await ref
             .where(
               Filter.or(
-                Filter('name', isEqualTo: nameOrEmailOrPhone),
-                Filter('email', isEqualTo: nameOrEmailOrPhone),
-                Filter('phone', isEqualTo: nameOrEmailOrPhone),
+                Filter('name', isEqualTo: input),
+                Filter('email', isEqualTo: input),
+                Filter('phone', isEqualTo: input),
+              ),
+            )
+            .limit(5)
+            .get();
+
+    searchResults.assignAll(query.docs.map((doc) => doc.data()).toList());
+  }
+
+  Future<void> addNewClient(Map<String, dynamic> client) async {
+    final ref = _db
+        .collection('vendors')
+        .doc(vendorId)
+        .collection('shops')
+        .doc(shopId)
+        .collection('clients');
+
+    final existing =
+        await ref
+            .where(
+              Filter.or(
+                Filter('email', isEqualTo: client['email']),
+                Filter('phone', isEqualTo: client['phone']),
               ),
             )
             .limit(1)
             .get();
 
-    if (query.docs.isNotEmpty) {
-      selectedClient.value = query.docs.first.data();
+    DocumentReference docRef;
+
+    if (existing.docs.isNotEmpty) {
+      // Update the existing client
+      docRef = existing.docs.first.reference;
+      await docRef.update(client);
+    } else {
+      // Add new client
+      docRef = await ref.add(client);
     }
+
+    final docSnapshot = await docRef.get();
+    selectedClient.value = docSnapshot.data() as Map<String, dynamic>?;
+    Get.back();
+    Get.snackbar("Success", "Client added/updated successfully");
   }
 
   Future<void> createInvoice() async {
@@ -331,6 +235,21 @@ class InvoiceController extends GetxController {
       return;
     }
 
+    double subtotal = 0.0;
+    for (final product in selectedProducts) {
+      final qty = product['quantity'] ?? 1;
+      subtotal += (product['price'] ?? 0) * qty;
+    }
+    for (final service in selectedServices) {
+      final qty = service['quantity'] ?? 1;
+      subtotal += (service['price'] ?? 0) * qty;
+    }
+
+    double discount =
+        hasDiscount.value ? subtotal * (discountRate.value / 100) : 0;
+    tax.value = subtotal * TAX_RATE; // 18% GST
+    totalAmt.value = (subtotal - discount) + tax.value;
+
     final invoiceData = {
       "invoice_number": invoiceNumber.value,
       "issue_date": issueDate.value,
@@ -338,7 +257,11 @@ class InvoiceController extends GetxController {
       "products": selectedProducts,
       "services": selectedServices,
       "client": selectedClient.value,
-      "discount": hasDiscount.value ? discountAmt.value : 0,
+      "subtotal": subtotal,
+      "discount": discount,
+      "tax": tax.value,
+      "total": totalAmt.value,
+      "status": "Pending",
       "created_at": FieldValue.serverTimestamp(),
     };
 
@@ -351,5 +274,39 @@ class InvoiceController extends GetxController {
         .add(invoiceData);
 
     Get.snackbar("Success", "Invoice Created Successfully");
+  }
+
+  final RxList<Map<String, dynamic>> latestPendingOrUnpaid =
+      <Map<String, dynamic>>[].obs;
+
+  Future<void> fetchLatestPendingOrUnpaid() async {
+    final email = FirebaseAuth.instance.currentUser?.email;
+    if (email == null) return;
+
+    final shopSnapshot =
+        await _db
+            .collection('vendors')
+            .doc(email)
+            .collection('shops')
+            .limit(1)
+            .get();
+
+    if (shopSnapshot.docs.isEmpty) return;
+
+    final shopId = shopSnapshot.docs.first.id;
+
+    final query =
+        await _db
+            .collection('vendors')
+            .doc(email)
+            .collection('shops')
+            .doc(shopId)
+            .collection('invoices')
+            .where('status', whereIn: ['Pending', 'Unpaid'])
+            .orderBy('issue_date', descending: true)
+            .limit(5)
+            .get();
+
+    latestPendingOrUnpaid.assignAll(query.docs.map((doc) => doc.data()));
   }
 }

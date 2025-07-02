@@ -55,7 +55,7 @@ void showCreateShopBottomSheet(BuildContext context) {
               SizedBox(height: 50),
               _buildInput(nameController, "Shop Name"),
               _buildInput(shopImageUrl, "Shop Photo Link"),
-              _buildInput(gstController, "GST Number"),
+              // _buildInput(gstController, "GST Number"),
               _buildInput(taxController, "Tax Number"),
               _buildInput(typeController, "Shop Type"),
               _buildInput(categoryController, "Shop Category"),
@@ -82,7 +82,7 @@ void showCreateShopBottomSheet(BuildContext context) {
                     final data = {
                       "shop_name": nameController.text.trim(),
                       "shop_image_link": shopImageUrl.text.trim(),
-                      "gst_number": gstController.text.trim(),
+                      // "gst_number": gstController.text.trim(),
                       "tax_number": taxController.text.trim(),
                       "shop_type": typeController.text.trim(),
                       "shop_category": categoryController.text.trim(),

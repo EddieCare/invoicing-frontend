@@ -7,6 +7,7 @@ import '../../controllers/auth/auth_controller.dart';
 import '../../controllers/profile/profile_controller.dart';
 import '../../controllers/shop/shop_controller.dart';
 import '../../routes/app_routes.dart';
+import '../../utils/web_launcher.dart';
 
 class ProfileScreen extends StatelessWidget {
   ProfileScreen({super.key});
@@ -75,11 +76,11 @@ class ProfileScreen extends StatelessWidget {
             _buildSettingsCard(
               context,
               children: [
-                _buildListTile(
-                  Icons.edit,
-                  "Edit profile information",
-                  onTap: () => {Get.toNamed(Routes.editProfile)},
-                ),
+                // _buildListTile(
+                //   Icons.edit,
+                //   "Edit profile information",
+                //   onTap: () => {Get.toNamed(Routes.editProfile)},
+                // ),
                 _buildListTile(
                   Icons.notifications_none,
                   "Notifications",
@@ -129,10 +130,6 @@ class ProfileScreen extends StatelessWidget {
               ],
             ),
 
-            _buildSettingsCard(
-              context,
-              children: [_buildListTile(Icons.security, "Security")],
-            ),
             // Spacer(),
             SizedBox(height: 10),
             _buildSettingsCard(
@@ -145,9 +142,36 @@ class ProfileScreen extends StatelessWidget {
                   "App version ${Config.versionCode}",
                 ),
                 // _buildListTile(Icons.support_agent, "Help & Support"),
-                _buildListTile(Icons.chat_bubble_outline, "Contact us"),
-                _buildListTile(Icons.lock_outline, "Privacy policy"),
-                _buildListTile(Icons.terminal_sharp, "Terms of Services"),
+                _buildListTile(
+                  Icons.chat_bubble_outline,
+                  "Contact us",
+                  onTap:
+                      () => launchWebUri(
+                        context: context,
+                        url: Config.contactUsLink,
+                        title: 'Contact Us',
+                      ),
+                ),
+                _buildListTile(
+                  Icons.lock_outline,
+                  "Privacy policy",
+                  onTap:
+                      () => launchWebUri(
+                        context: context,
+                        url: Config.privacyPolicyLink,
+                        title: 'Privacy Policy',
+                      ),
+                ),
+                _buildListTile(
+                  Icons.terminal_sharp,
+                  "Terms of Services",
+                  onTap:
+                      () => launchWebUri(
+                        context: context,
+                        url: Config.invoiceDailyLink,
+                        title: 'Terms of Services',
+                      ),
+                ),
                 _buildListTile(
                   Icons.logout_sharp,
                   "Logout",

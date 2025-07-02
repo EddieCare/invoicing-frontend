@@ -16,7 +16,7 @@ class ProductScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColor.pageColor,
       appBar: TopBar(
-        title: "Product",
+        title: "Products & Services",
         showBackButton: false,
         showMenu: true,
         actions: const [SizedBox(width: 16)],
@@ -42,7 +42,7 @@ class ProductScreen extends StatelessWidget {
   }
 
   Widget _filterBar(ProductController controller) {
-    final options = ['Product', 'Service'];
+    final options = ['All', 'Product', 'Service'];
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -175,13 +175,23 @@ class ProductScreen extends StatelessWidget {
                     // color: Colors.grey.shade300,
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Image.network(
-                    item["image_link"] ??
-                        "https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcQyhP--a8Qb3RebW0AR2zNFQxG5Oh9eQsG6Q7gFax_4EkzB4TWFNnyCs2INPHxZGp4FPZ9s_670RIdH89S_D-TAkStBI4R2oQfq4gwEzkeukwCz6xWik8ESxg",
-                    width: 90,
-                    height: 90,
-                    fit: BoxFit.contain,
-                  ),
+                  child:
+                      item["image_link"] != null &&
+                              item["image_link"].isNotEmpty
+                          ? Image.network(
+                            item["image_link"],
+                            width: 90,
+                            height: 90,
+                            fit: BoxFit.contain,
+                          )
+                          : Image.asset(
+                            item["type"] == 'product'
+                                ? "assets/icons/producticon.png"
+                                : "assets/icons/serviceicon.png",
+                            width: 70,
+                            height: 70,
+                            fit: BoxFit.contain,
+                          ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(

@@ -36,9 +36,10 @@ class SplashController extends GetxController {
     }
 
     final uid = user.uid;
+    final email = user.email;
 
     try {
-      final vendorDoc = await _firestore.collection('vendors').doc(uid).get();
+      final vendorDoc = await _firestore.collection('vendors').doc(email).get();
 
       if (!vendorDoc.exists) {
         // User is signed in but hasn't completed vendor details
