@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -75,7 +76,11 @@ class CreateInvoiceScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  _actionButton("Save", black: true),
+                  _actionButton(
+                    "Save",
+                    black: true,
+                    onTap: () => controller.createInvoice(),
+                  ),
                   const SizedBox(width: 10),
                   _actionButton("Discard", black: true),
                 ],
@@ -329,7 +334,7 @@ class CreateInvoiceScreen extends StatelessWidget {
             onChanged:
                 (value) => {
                   print("value is this--> $value"),
-                  controller.updateDiscountAmt(value),
+                  controller.updateDiscountRate(value),
                 },
 
             decoration: InputDecoration(
@@ -344,7 +349,10 @@ class CreateInvoiceScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text("Subtotal", style: TextStyle(color: Colors.black54)),
-              Text("\$244.94"),
+              Text(
+                controller.subTotal.value.toStringAsFixed(2),
+                style: TextStyle(color: Colors.black54),
+              ),
             ],
           ),
           const SizedBox(height: 8),
@@ -352,18 +360,27 @@ class CreateInvoiceScreen extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                "Discount (${controller.discountAmt.value}%)",
+                "Discount (${controller.discountRate.value}%)",
                 style: TextStyle(color: Colors.green),
               ),
-              Text("-\$12.25", style: TextStyle(color: Colors.green)),
+              Text(
+                controller.discountAmt.value.toStringAsFixed(2),
+                style: TextStyle(color: Colors.green),
+              ),
             ],
           ),
           const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text("Tax (8%)", style: TextStyle(color: Colors.red)),
-              Text("\$19.60", style: TextStyle(color: Colors.red)),
+              Text(
+                "Tax (${controller.TAX_RATE}%)",
+                style: TextStyle(color: Colors.red),
+              ),
+              Text(
+                controller.tax.value.toStringAsFixed(2),
+                style: TextStyle(color: Colors.red),
+              ),
             ],
           ),
           const SizedBox(height: 8),
@@ -377,7 +394,7 @@ class CreateInvoiceScreen extends StatelessWidget {
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
               Text(
-                "\$356.29",
+                controller.totalAmt.value.toStringAsFixed(2),
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
             ],
@@ -389,46 +406,74 @@ class CreateInvoiceScreen extends StatelessWidget {
   }
 
   Widget _buildClientCard() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text("CLIENT", style: TextStyle(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 8),
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: Colors.grey.shade100,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Row(
-            children: [
-              CircleAvatar(
-                backgroundColor: Colors.blue.shade100,
-                child: Text("J", style: TextStyle(color: Colors.black)),
+    return Obx(() {
+      final client = controller.selectedClient.value;
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text("CLIENT", style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 8),
+          GestureDetector(
+            onTap: () => showClientPopup(controller),
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.grey.shade100,
+                borderRadius: BorderRadius.circular(12),
               ),
-              const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
                 children: [
-                  Text(
-                    "John Doe",
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  CircleAvatar(
+                    backgroundColor: Colors.blue.shade100,
+                    child: Text(
+                      client != null
+                          ? (client['name']
+                                  ?.toString()
+                                  .substring(0, 1)
+                                  .toUpperCase() ??
+                              'C')
+                          : '?',
+                      style: TextStyle(color: Colors.black),
+                    ),
                   ),
-                  Text("johndoe@gmail.com"),
+                  const SizedBox(width: 12),
+                  if (client != null)
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            client['name'] ?? 'Unknown',
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text(client['email'] ?? ''),
+                          if (client['phone'] != null)
+                            Text(
+                              client['phone'],
+                              style: TextStyle(fontSize: 12),
+                            ),
+                        ],
+                      ),
+                    )
+                  else
+                    Expanded(child: Text("Tap to select or add a client")),
+                  Transform.rotate(
+                    angle: -100,
+                    child: Icon(Icons.arrow_circle_up_rounded, size: 24),
+                  ),
                 ],
               ),
-              Spacer(),
-              Transform.rotate(
-                angle: -100,
-                child: Icon(Icons.arrow_circle_up_rounded, size: 24),
-              ),
-            ],
+            ),
           ),
-        ),
-        const SizedBox(height: 8),
-        _addButton("Add Client", black: false),
-      ],
-    );
+          const SizedBox(height: 8),
+          _addButton(
+            "Add Client",
+            black: false,
+            onTap: () => showClientPopup(controller),
+          ),
+        ],
+      );
+    });
   }
 
   Widget _actionButton(String text, {VoidCallback? onTap, bool black = false}) {
@@ -449,12 +494,18 @@ class CreateInvoiceScreen extends StatelessWidget {
   void _showProductPopup(InvoiceController controller) {
     final RxMap<String, int> tempQuantities = <String, int>{}.obs;
 
+    // Pre-fill with selected product quantities
+    for (var p in controller.selectedProducts) {
+      final id = p['id'] ?? p['name'];
+      tempQuantities[id] = p['quantity'] ?? 1;
+    }
+
     Get.bottomSheet(
       Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: Obx(
           () => ListView(
@@ -474,7 +525,7 @@ class CreateInvoiceScreen extends StatelessWidget {
                       ],
                     ),
                     trailing: Row(
-                      mainAxisSize: MainAxisSize.min, // This is the key fix
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
                           icon: const Icon(Icons.remove_circle_outline),
@@ -513,7 +564,6 @@ class CreateInvoiceScreen extends StatelessWidget {
                                       ...product,
                                       'quantity': qty,
                                     });
-                                    // Get.back();
                                   }
                                   : null,
                           child: const Text(
@@ -534,20 +584,26 @@ class CreateInvoiceScreen extends StatelessWidget {
   void _showServicePopup(InvoiceController controller) {
     final RxMap<String, int> tempQuantities = <String, int>{}.obs;
 
+    // Pre-fill with selected service quantities
+    for (var s in controller.selectedServices) {
+      final id = s['id'] ?? s['name'];
+      tempQuantities[id] = s['quantity'] ?? s['hours'] ?? 1;
+    }
+
     Get.bottomSheet(
       Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         ),
         child: Obx(
           () => ListView(
             shrinkWrap: true,
             children:
                 controller.allServices.map((service) {
-                  final productId = service['id'] ?? service['name'];
-                  final qty = tempQuantities[productId] ?? 0;
+                  final serviceId = service['id'] ?? service['name'];
+                  final qty = tempQuantities[serviceId] ?? 0;
 
                   return ListTile(
                     title: Text(service['name']),
@@ -559,14 +615,14 @@ class CreateInvoiceScreen extends StatelessWidget {
                       ],
                     ),
                     trailing: Row(
-                      mainAxisSize: MainAxisSize.min, // This is the key fix
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         IconButton(
                           icon: const Icon(Icons.remove_circle_outline),
                           onPressed:
                               qty > 0
                                   ? () {
-                                    tempQuantities[productId] = qty - 1;
+                                    tempQuantities[serviceId] = qty - 1;
                                     tempQuantities.refresh();
                                   }
                                   : null,
@@ -575,7 +631,7 @@ class CreateInvoiceScreen extends StatelessWidget {
                         IconButton(
                           icon: const Icon(Icons.add_circle_outline),
                           onPressed: () {
-                            tempQuantities[productId] = qty + 1;
+                            tempQuantities[serviceId] = qty + 1;
                             tempQuantities.refresh();
                           },
                         ),
@@ -596,9 +652,8 @@ class CreateInvoiceScreen extends StatelessWidget {
                                   ? () {
                                     controller.addService({
                                       ...service,
-                                      'hours': qty,
+                                      'quantity': qty,
                                     });
-                                    // Get.back();
                                   }
                                   : null,
                           child: const Text(
@@ -612,6 +667,179 @@ class CreateInvoiceScreen extends StatelessWidget {
                 }).toList(),
           ),
         ),
+      ),
+    );
+  }
+
+  void showClientPopup(InvoiceController controller) {
+    final searchController = TextEditingController();
+    final nameController = TextEditingController();
+    final emailController = TextEditingController();
+    final phoneController = TextEditingController();
+
+    Get.bottomSheet(
+      SingleChildScrollView(
+        padding: EdgeInsets.all(16),
+        child: Obx(() {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                padding: EdgeInsets.all(16),
+                margin: EdgeInsets.only(bottom: 16),
+                width: 50,
+                height: 5,
+                decoration: BoxDecoration(
+                  color: Colors.black12,
+                  borderRadius: BorderRadius.circular(50),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                "Add/Search Client",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              SizedBox(height: 16),
+              // Search field
+              TextField(
+                controller: searchController,
+                onChanged:
+                    (value) => controller.setClientBySearch(value.trim()),
+                decoration: InputDecoration(
+                  hintText: "Search by name, email or phone",
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  suffixIcon: Icon(Icons.search),
+                ),
+              ),
+              const SizedBox(height: 8),
+              // Dropdown list
+              if (controller.searchResults.isNotEmpty)
+                Container(
+                  padding: EdgeInsets.symmetric(vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black12,
+                        blurRadius: 8,
+                        offset: Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children:
+                        controller.searchResults.map((client) {
+                          return ListTile(
+                            title: Text(client['name'] ?? 'Unnamed'),
+                            subtitle: Text(
+                              "${client['email'] ?? ''} • ${client['phone'] ?? ''}",
+                            ),
+                            onTap: () {
+                              controller.selectedClient.value = client;
+                              nameController.text = client['name'] ?? '';
+                              emailController.text = client['email'] ?? '';
+                              phoneController.text = client['phone'] ?? '';
+                              controller.searchResults.clear(); // Hide dropdown
+                              searchController.clear();
+                            },
+                          );
+                        }).toList(),
+                  ),
+                ),
+              const SizedBox(height: 16),
+              // Input fields
+              TextField(
+                controller: nameController,
+                decoration: InputDecoration(
+                  labelText: "Name",
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: emailController,
+                decoration: InputDecoration(
+                  labelText: "Email",
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                controller: phoneController,
+                decoration: InputDecoration(
+                  labelText: "Phone",
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              _actionButton(
+                "Add Client",
+                black: true,
+                onTap: () async {
+                  final newClient = {
+                    "name": nameController.text.trim(),
+                    "email": emailController.text.trim(),
+                    "phone": phoneController.text.trim(),
+                    "created_at": FieldValue.serverTimestamp(),
+                  };
+                  await controller.addNewClient(newClient);
+                  Get.back(); // Close the bottom sheet
+                },
+              ),
+              const SizedBox(height: 16),
+
+              // ElevatedButton(
+              //   onPressed: () async {
+              //     final newClient = {
+              //       "name": nameController.text.trim(),
+              //       "email": emailController.text.trim(),
+              //       "phone": phoneController.text.trim(),
+              //       "created_at": FieldValue.serverTimestamp(),
+              //     };
+              //     await controller.addNewClient(newClient);
+              //     Get.back();
+              //   },
+              //   style: ElevatedButton.styleFrom(
+              //     padding: EdgeInsets.symmetric(horizontal: 32, vertical: 14),
+              //     shape: RoundedRectangleBorder(
+              //       borderRadius: BorderRadius.circular(30),
+              //     ),
+              //   ),
+              //   child: Text("Add Client"),
+              // ),
+            ],
+          );
+        }),
+      ),
+      backgroundColor: Colors.white,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
     );
   }

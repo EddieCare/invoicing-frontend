@@ -2,6 +2,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
+import '../invoice/invoice_controller.dart';
+
 class DashboardController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -12,10 +14,13 @@ class DashboardController extends GetxController {
   String? get uid => _auth.currentUser?.uid;
   String? get email => _auth.currentUser?.email;
 
+  final InvoiceController invoiceController = Get.put(InvoiceController());
+
   @override
   void onInit() {
     super.onInit();
     fetchShopDetails();
+    invoiceController.fetchLatestPendingOrUnpaid();
   }
 
   Future<void> fetchShopDetails() async {

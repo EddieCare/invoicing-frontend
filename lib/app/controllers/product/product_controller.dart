@@ -72,7 +72,7 @@ class ProductController extends GetxController {
     final shopId = shopSnapshot.docs.first.id;
     final collection = isService ? 'services' : 'products';
 
-    print("Product =--=-=-=-=-=-=> $email, $shopId, $collection ");
+    print("Product =--=-=-=-=-=-=> $email, $shopId, $collection");
     final itemData = {
       'name': nameController.text.trim(),
       'image_link': imageLink.text.trim(),

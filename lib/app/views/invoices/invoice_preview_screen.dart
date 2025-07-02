@@ -3,9 +3,12 @@ import 'package:get/get.dart';
 
 import '../../../components/top_bar.dart';
 import '../../../values/values.dart';
+import '../../controllers/invoice/invoice_preview_controller.dart';
 
 class InvoicePreviewScreen extends StatelessWidget {
-  const InvoicePreviewScreen({super.key});
+  InvoicePreviewScreen({super.key});
+
+  final controller = Get.put(InvoicePreviewController());
 
   @override
   Widget build(BuildContext context) {
@@ -56,29 +59,34 @@ class InvoicePreviewScreen extends StatelessWidget {
   }
 
   Widget _header() {
+    final inv = controller.invoice;
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
+            children: [
               Text(
-                "INVOICE #INV-20240304-001",
+                "INVOICE #${inv['invoice_number'] ?? '-'}",
                 style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
               ),
               SizedBox(height: 12),
-              Text("Elite Tech Solutions", style: TextStyle(fontSize: 16)),
-              Text("1234 Silicon Valley, CA, USA"),
-              Text("contact@elitetech.com"),
-              Text("+1 555-1234-567"),
+              Text(
+                inv['shop_name'] ?? "Shop Name",
+                style: TextStyle(fontSize: 16),
+              ),
+              Text(inv['shop_address'] ?? "Address"),
+              Text(inv['shop_email'] ?? "email@example.com"),
+              Text(inv['shop_phone'] ?? "+1 000-0000"),
             ],
           ),
         ),
-        const SizedBox(width: 12),
+        SizedBox(width: 12),
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+          padding: const EdgeInsets.all(10),
           width: 32,
           height: 32,
           decoration: BoxDecoration(
@@ -116,19 +124,24 @@ class InvoicePreviewScreen extends StatelessWidget {
   }
 
   Widget _itemsTable() {
+    final items = controller.invoice['items'] ?? [];
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           "Items",
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16),
         _tableHeader(),
-        const SizedBox(height: 8),
-        _tableRow("2", "Logitech MX Keys Wireless Keyboard", "\$90.00"),
-        _tableRow("1", "Sony WH-1000XM5 Bluetooth Headphones", "\$120.00"),
-        _tableRow("3", "Anker PowerLine+ USB-C Cable", "\$80.00"),
+        SizedBox(height: 8),
+        for (var item in items)
+          _tableRow(
+            item['quantity'].toString(),
+            item['name'],
+            '\$${item['total'].toStringAsFixed(2)}',
+          ),
       ],
     );
   }
@@ -170,39 +183,55 @@ class InvoicePreviewScreen extends StatelessWidget {
   }
 
   Widget _summary() {
+    final subtotal = controller.invoice['subtotal'] ?? 0.0;
+    final discount = controller.invoice['discount'] ?? 0.0;
+    final tax = controller.invoice['tax'] ?? 0.0;
+    final total = controller.invoice['total'] ?? 0.0;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
-      children: const [
-        _SummaryRow(label: "Subtotal", value: "\$244.94"),
+      children: [
         _SummaryRow(
-          label: "Discount (15%)",
-          value: "-\$12.25",
-          valueColor: Colors.green,
+          label: "Subtotal",
+          value: "\$${subtotal.toStringAsFixed(2)}",
         ),
-        _SummaryRow(
-          label: "Tax (8%)",
-          value: "\$19.60",
-          valueColor: Colors.orange,
-        ),
+        if (discount > 0)
+          _SummaryRow(
+            label: "Discount",
+            value: "-\$${discount.toStringAsFixed(2)}",
+            valueColor: Colors.green,
+          ),
+        if (tax > 0)
+          _SummaryRow(
+            label: "Tax",
+            value: "\$${tax.toStringAsFixed(2)}",
+            valueColor: Colors.orange,
+          ),
         Divider(),
-        _SummaryRow(label: "Total", value: "\$252.29", isBold: true),
+        _SummaryRow(
+          label: "Total",
+          value: "\$${total.toStringAsFixed(2)}",
+          isBold: true,
+        ),
       ],
     );
   }
 
   Widget _customerDetails() {
+    final client = controller.invoice['client'] ?? {};
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
+      children: [
         Text(
           "Customer Info",
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
         ),
         SizedBox(height: 12),
-        _DetailRow(label: "Name", value: "John Doe"),
-        _DetailRow(label: "Address", value: "Flat 22/45, 34566 Baltimore, USA"),
-        _DetailRow(label: "Email", value: "johndoe@yahoo.com"),
-        _DetailRow(label: "Phone", value: "+1 545-1874-567"),
+        _DetailRow(label: "Name", value: client['name'] ?? '-'),
+        _DetailRow(label: "Address", value: client['address'] ?? '-'),
+        _DetailRow(label: "Email", value: client['email'] ?? '-'),
+        _DetailRow(label: "Phone", value: client['phone'] ?? '-'),
       ],
     );
   }
@@ -225,13 +254,11 @@ class InvoicePreviewScreen extends StatelessWidget {
         _button(context, "Discard", Icons.close, Colors.red),
         _button(
           context,
-          "Print",
+          "Download PDF",
           Icons.print,
           Colors.blue,
-          onPressed: () {
-            ScaffoldMessenger.of(
-              context,
-            ).showSnackBar(const SnackBar(content: Text("Printing...")));
+          onPressed: () async {
+            await controller.downloadPdf();
           },
         ),
         _button(
@@ -239,7 +266,8 @@ class InvoicePreviewScreen extends StatelessWidget {
           "Send",
           Icons.send,
           Colors.green,
-          onPressed: () {
+          onPressed: () async {
+            await controller.sendInvoiceToClient();
             ScaffoldMessenger.of(
               context,
             ).showSnackBar(const SnackBar(content: Text("Invoice sent!")));

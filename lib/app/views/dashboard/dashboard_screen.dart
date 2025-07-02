@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:invoicedaily/app/routes/app_routes.dart';
@@ -6,6 +7,7 @@ import 'package:invoicedaily/components/urgent_notification_card.dart';
 import '../../../components/top_bar.dart';
 import '../../../values/values.dart';
 import '../../controllers/dashboard/dashboard_controller.dart';
+import '../../controllers/invoice/invoice_controller.dart';
 import '../../controllers/shop/shop_controller.dart';
 import '../shop/shop_create.dart';
 
@@ -214,11 +216,10 @@ class DashboardScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-                  // const SizedBox(height: 18),
-                  // recentInvoices(screenSize),
                   const SizedBox(height: 24),
                   pendingInvoices(screenSize),
-                  const SizedBox(height: 24),
+
+                  SizedBox(height: 24),
                 ],
               ),
             ),
@@ -256,60 +257,6 @@ class DashboardScreen extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Container recentInvoices(Size screenSize) {
-    return Container(
-      width: screenSize.width * 0.9,
-      padding: EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-      decoration: BoxDecoration(
-        color: Colors.white70,
-        borderRadius: BorderRadius.all(Radius.circular(20)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black12.withAlpha(10),
-            offset: Offset(0, 3),
-            blurRadius: 1,
-            spreadRadius: 2,
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.max,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Column(
-            mainAxisSize: MainAxisSize.max,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                "Recent Invoices",
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w500,
-                  color: Colors.black,
-                ),
-              ),
-              Text(
-                "Check recent invoices",
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w200,
-                  color: Colors.black87,
-                ),
-              ),
-            ],
-          ),
-
-          recentInvoiceCard(),
-          recentInvoiceCard(),
-          recentInvoiceCard(),
-          recentInvoiceCard(),
-        ],
       ),
     );
   }
@@ -359,16 +306,167 @@ class DashboardScreen extends StatelessWidget {
             ],
           ),
 
-          pendingInvoiceCard(),
-          pendingInvoiceCard(),
-          pendingInvoiceCard(),
-          pendingInvoiceCard(),
+          Obx(() {
+            final invoices =
+                Get.find<InvoiceController>().latestPendingOrUnpaid;
+            return Column(
+              children:
+                  invoices.isNotEmpty
+                      ? invoices.map((invoice) {
+                        return pendingInvoiceCard(invoice);
+                      }).toList()
+                      : [
+                        Center(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                              vertical: 30.0,
+                              horizontal: 10,
+                            ),
+                            child: Text(
+                              "No pending invoices found.",
+                              style: TextStyle(
+                                color: AppColor.textColorPrimary.withAlpha(50),
+                                fontWeight: FontWeight.w300,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+            );
+          }),
         ],
       ),
     );
   }
 
-  Container recentInvoiceCard() {
+  // Container pendingInvoiceCard() {
+  //   return Container(
+  //     decoration: BoxDecoration(
+  //       borderRadius: BorderRadius.all(Radius.circular(15)),
+  //       border: Border.all(color: Colors.black12.withAlpha(14), width: 2),
+  //       color: Color(0xFF7A7A7A).withAlpha(16),
+  //     ),
+  //     margin: EdgeInsets.only(top: 18),
+  //     padding: EdgeInsets.symmetric(vertical: 4),
+  //     child: ListTile(
+  //       leading: Container(
+  //         decoration: BoxDecoration(
+  //           borderRadius: BorderRadius.all(Radius.circular(15)),
+  //         ),
+  //         child: Image.asset(
+  //           "assets/images/pending_invoice.png",
+  //           height: 45,
+  //           width: 45,
+  //         ),
+  //       ),
+  //       title: Text(
+  //         "INV-20240304-003",
+  //         style: TextStyle(
+  //           fontSize: 12,
+  //           fontWeight: FontWeight.w200,
+  //           color: Colors.black,
+  //         ),
+  //       ),
+  //       subtitle: Column(
+  //         mainAxisSize: MainAxisSize.max,
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           Text(
+  //             "Pending Invoice",
+  //             style: TextStyle(
+  //               fontSize: 18,
+  //               fontWeight: FontWeight.w500,
+  //               color: Colors.black,
+  //             ),
+  //           ),
+  //           Text(
+  //             "Due: 27 March, 2025",
+  //             style: TextStyle(
+  //               fontSize: 14,
+  //               fontWeight: FontWeight.w400,
+  //               color: Colors.red,
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //       trailing: Text(
+  //         "4000 AUD",
+  //         style: TextStyle(
+  //           fontSize: 16,
+  //           fontWeight: FontWeight.w700,
+  //           color: Colors.black,
+  //         ),
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  // Widget pendingInvoiceCard(Map<String, dynamic> invoice) {
+  //   return Container(
+  //     decoration: BoxDecoration(
+  //       borderRadius: BorderRadius.all(Radius.circular(15)),
+  //       border: Border.all(color: Colors.black12.withAlpha(14), width: 2),
+  //       color: Color(0xFF7A7A7A).withAlpha(16),
+  //     ),
+  //     margin: EdgeInsets.only(top: 18),
+  //     padding: EdgeInsets.symmetric(vertical: 4),
+  //     child: ListTile(
+  //       leading: Image.asset(
+  //         "assets/images/pending_invoice.png",
+  //         height: 45,
+  //         width: 45,
+  //       ),
+  //       title: Text(
+  //         invoice['invoice_number'] ?? '',
+  //         style: TextStyle(fontSize: 12, fontWeight: FontWeight.w200),
+  //       ),
+  //       subtitle: Column(
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           Text(
+  //             "${invoice['status']} Invoice",
+  //             style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+  //           ),
+  //           Text(
+  //             "Due: ${_formatDate(invoice['due_date'])}",
+  //             style: TextStyle(fontSize: 14, color: Colors.red),
+  //           ),
+  //         ],
+  //       ),
+  //       trailing: Text(
+  //         "${invoice['total'] ?? 0} AUD",
+  //         style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  // String _formatDate(Timestamp? timestamp) {
+  //   if (timestamp == null) return '';
+  //   final date = timestamp.toDate();
+  //   return "${date.day} ${_monthName(date.month)}, ${date.year}";
+  // }
+
+  // String _monthName(int month) {
+  //   const months = [
+  //     "",
+  //     "January",
+  //     "February",
+  //     "March",
+  //     "April",
+  //     "May",
+  //     "June",
+  //     "July",
+  //     "August",
+  //     "September",
+  //     "October",
+  //     "November",
+  //     "December",
+  //   ];
+  //   return months[month];
+  // }
+
+  Widget pendingInvoiceCard(Map<String, dynamic> invoice) {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.all(Radius.circular(15)),
@@ -378,118 +476,59 @@ class DashboardScreen extends StatelessWidget {
       margin: EdgeInsets.only(top: 18),
       padding: EdgeInsets.symmetric(vertical: 4),
       child: ListTile(
-        leading: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(15)),
-          ),
-          child: Image.asset(
-            "assets/images/checkicon.png",
-            height: 45,
-            width: 45,
-          ),
+        leading: Image.asset(
+          "assets/images/pending_invoice.png",
+          height: 45,
+          width: 45,
         ),
         title: Text(
-          "INV-20240304-003",
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w200,
-            color: Colors.black,
-          ),
+          invoice['invoice_number'] ?? '',
+          style: TextStyle(fontSize: 12, fontWeight: FontWeight.w200),
         ),
         subtitle: Column(
-          mainAxisSize: MainAxisSize.max,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              "Pending Invoice",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                color: Colors.black,
-              ),
+              "${invoice['status']} Invoice",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
             ),
-            // Text(
-            //   "Due: 27 March, 2025",
-            //   style: TextStyle(
-            //     fontSize: 14,
-            //     fontWeight: FontWeight.w200,
-            //     color: Colors.red,
-            //   ),
-            // ),
+            Text(
+              "Due: ${_formatDate(invoice['due_date'])}",
+              style: TextStyle(fontSize: 14, color: Colors.red),
+            ),
           ],
         ),
         trailing: Text(
-          "4000 AUD",
-          style: TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w500,
-            color: Colors.black,
-          ),
+          "${invoice['total'] ?? 0} AUD",
+          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
         ),
       ),
     );
   }
 
-  Container pendingInvoiceCard() {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(15)),
-        border: Border.all(color: Colors.black12.withAlpha(14), width: 2),
-        color: Color(0xFF7A7A7A).withAlpha(16),
-      ),
-      margin: EdgeInsets.only(top: 18),
-      padding: EdgeInsets.symmetric(vertical: 4),
-      child: ListTile(
-        leading: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(15)),
-          ),
-          child: Image.asset(
-            "assets/images/pending_invoice.png",
-            height: 45,
-            width: 45,
-          ),
-        ),
-        title: Text(
-          "INV-20240304-003",
-          style: TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w200,
-            color: Colors.black,
-          ),
-        ),
-        subtitle: Column(
-          mainAxisSize: MainAxisSize.max,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Pending Invoice",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
-                color: Colors.black,
-              ),
-            ),
-            Text(
-              "Due: 27 March, 2025",
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-                color: Colors.red,
-              ),
-            ),
-          ],
-        ),
-        trailing: Text(
-          "4000 AUD",
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-            color: Colors.black,
-          ),
-        ),
-      ),
-    );
+  String _formatDate(Timestamp? timestamp) {
+    if (timestamp == null) return '';
+    final date = timestamp.toDate();
+    return "${date.day} ${_monthName(date.month)}, ${date.year}";
+  }
+
+  String _monthName(int month) {
+    const months = [
+      "",
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December",
+    ];
+    return months[month];
   }
 
   Widget _buildShopCard(Map<String, dynamic> shopData, Size screenSize) {
