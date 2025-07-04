@@ -37,6 +37,13 @@
             {
               "client_id": "477054082230-0cpiqf3jgevrfo92nadtgobn7eoe7pb2.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "477054082230-dopo2pdm51a7l5g9scqjcik77ac1ubbp.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.invoicedaily"
+              }
             }
           ]
         }

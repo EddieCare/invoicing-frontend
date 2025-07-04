@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CLIENT_ID</key>
-	<string>477054082230-degdbrjjru33ibqs9qejmqhkb1o7uad1.apps.googleusercontent.com</string>
+	<string>477054082230-dopo2pdm51a7l5g9scqjcik77ac1ubbp.apps.googleusercontent.com</string>
 	<key>REVERSED_CLIENT_ID</key>
-	<string>com.googleusercontent.apps.477054082230-degdbrjjru33ibqs9qejmqhkb1o7uad1</string>
+	<string>com.googleusercontent.apps.477054082230-dopo2pdm51a7l5g9scqjcik77ac1ubbp</string>
 	<key>ANDROID_CLIENT_ID</key>
 	<string>477054082230-o7259bf31asjr2ls151bc8u8c9q4v4j9.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
@@ -15,7 +15,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.invoicedaily.apptest</string>
+	<string>com.invoicedaily</string>
 	<key>PROJECT_ID</key>
 	<string>invoice-daily-c6e50</string>
 	<key>STORAGE_BUCKET</key>
@@ -31,6 +31,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:477054082230:ios:8d830991f74848ee079a17</string>
+	<string>1:477054082230:ios:74332fe8f757e70c079a17</string>
 </dict>
 </plist>
