@@ -44,12 +44,6 @@ flutter:
     - assets/flags/
     - assets/icons/
     - assets/lottie/
-    - assets/icons/launcher_icon.png
-
-flutter_launcher_icons:
-  image_path: "assets/icons/launcher_icon.png"
-  android: true
-  ios: true
 
   # fonts:
   #   - family: Schyler
@@ -62,3 +56,18 @@ flutter_launcher_icons:
   #       - asset: fonts/TrajanPro.ttf
   #       - asset: fonts/TrajanPro_Bold.ttf
   #         weight: 700
+
+flutter_launcher_icons:
+  # image_path: "assets/icons/launcher_icon.png"
+  # android: true
+  # ios: true
+  # remove_alpha_ios: true
+  # background_color: "#000000"
+  # adaptive_icon_background: "#000000"
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  image_path_android: "assets/icons/launcher_icon_full_black.png" # Full square for Android
+  image_path_ios: "assets/icons/launcher_icon_full_black.png" # Full square for iOS
+  adaptive_icon_background: "assets/icons/launcher_icon_background.png"
+  adaptive_icon_foreground: "assets/icons/launcher_icon_foreground.png"
