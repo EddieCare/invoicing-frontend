@@ -20,7 +20,7 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    String _monthName(int month) {
+    String monthName(int month) {
       const months = [
         "Jan",
         "Feb",
@@ -74,7 +74,7 @@ class DashboardScreen extends StatelessWidget {
                         Text(
                           // "Apr 16, 2025",
                           "${DateTime.now().toLocal().day.toString().padLeft(2, '0')} "
-                          "${_monthName(DateTime.now().month)}, "
+                          "${monthName(DateTime.now().month)}, "
                           "${DateTime.now().year}",
                           style: TextStyle(
                             fontSize: 16,
@@ -123,7 +123,7 @@ class DashboardScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Text(
-                              "Financial Overview",
+                              "Financial Overview-s",
                               style: TextStyle(
                                 fontSize: 28,
                                 fontWeight: FontWeight.w500,
