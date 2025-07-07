@@ -58,16 +58,10 @@ flutter:
   #         weight: 700
 
 flutter_launcher_icons:
-  # image_path: "assets/icons/launcher_icon.png"
-  # android: true
-  # ios: true
-  # remove_alpha_ios: true
-  # background_color: "#000000"
-  # adaptive_icon_background: "#000000"
   android: true
   ios: true
   remove_alpha_ios: true
-  image_path_android: "assets/icons/launcher_icon_full_black.png" # Full square for Android
-  image_path_ios: "assets/icons/launcher_icon_full_black.png" # Full square for iOS
+  image_path_android: "assets/icons/launcher_icon_full_black.png"
+  image_path_ios: "assets/icons/launcher_icon_full_black.png"
   adaptive_icon_background: "assets/icons/launcher_icon_background.png"
   adaptive_icon_foreground: "assets/icons/launcher_icon_foreground.png"
