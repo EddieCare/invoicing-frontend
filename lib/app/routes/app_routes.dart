@@ -21,6 +21,7 @@ abstract class Routes {
 
   // Product
   static const addProductScreen = '/addProductScreen';
+  static const addServiceScreen = '/addServiceScreen';
   static const viewProductScreen = '/viewProductScreen';
   static const editProductScreen = '/editProductScreen';
 

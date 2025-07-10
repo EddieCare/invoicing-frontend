@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../components/dialogs.dart';
+import '../../../components/input_fld.dart';
 import '../../../components/top_bar.dart';
 import '../../../values/values.dart';
 import '../../controllers/product/product_controller.dart';
@@ -29,46 +30,58 @@ class AddProductScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildTextField("Name", productController.nameController),
+              buildInputField(
+                productController.nameController,
+                "Name",
+                isRequired: true,
+              ),
               // TODO: Gallery or capture and upload
-              _buildTextField("Add an image Link", productController.imageLink),
-
+              buildInputField(productController.imageLink, "Add an image Link"),
               if (!isService)
-                _buildTextField(
-                  "Stock Keep Unit",
+                buildInputField(
                   productController.skuController,
+                  "Stock Keep Unit",
                 ),
               if (!isService)
-                _buildTextField("Brand", productController.brandController),
-              _buildDropdown(
-                "Category",
-                productController.selectedCategory,
-                productController.categoryOptions,
+                buildInputField(
+                  productController.brandController,
+                  "Brand",
+                  isRequired: true,
+                ),
+              Obx(
+                () => buildDropdownField(
+                  "Category",
+                  productController.selectedCategory,
+                  productController.categoryOptions.value,
+                  isRequired: true,
+                ),
               ),
               if (!isService)
-                _buildTextField(
-                  "Quantity",
+                buildInputField(
                   productController.quantityController,
-                  isNumber: true,
+                  "Quantity",
+                  isRequired: true,
+                  // isNumber: true,
                 ),
-              _buildDropdown(
+              buildDropdownField(
                 "Status",
                 productController.selectedStatus,
                 productController.statusOptions,
+                isRequired: true,
               ),
               if (!isService)
-                _buildTextField(
-                  "Unit Type",
+                buildInputField(
                   productController.unitTypeController,
+                  "Unit Type",
                 ),
-              _buildTextField(
-                !isService ? "Price" : "Price per hour",
+              buildInputField(
                 productController.priceController,
-                isNumber: true,
+                !isService ? "Price" : "Price per hour",
+                // isNumber: true,
               ),
-              _buildTextField(
-                "Notes",
+              buildInputField(
                 productController.notesController,
+                "Notes",
                 maxLines: 3,
               ),
               const SizedBox(height: 24),
@@ -79,19 +92,19 @@ class AddProductScreen extends StatelessWidget {
                 ),
               if (!isService) const SizedBox(height: 20),
               if (!isService)
-                _buildTextField(
-                  "Name",
+                buildInputField(
                   productController.supplierNameController,
+                  "Name",
                 ),
               if (!isService)
-                _buildTextField(
-                  "Address",
+                buildInputField(
                   productController.supplierAddressController,
+                  "Address",
                 ),
               if (!isService)
-                _buildTextField(
-                  "Contact",
+                buildInputField(
                   productController.supplierContactController,
+                  "Contact",
                 ),
               const SizedBox(height: 24),
             ],
@@ -100,86 +113,79 @@ class AddProductScreen extends StatelessWidget {
       ),
 
       /// 🔽 Sticky Button Row here
-      bottomNavigationBar: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-        child: Row(
-          children: [
-            _buildButton(
-              "Discard",
-              onTap: () {
-                productController.resetForm();
-                showDialog(
-                  context: context,
-                  barrierDismissible: true,
-                  builder:
-                      (_) => ConfirmationDialog(
-                        title: "Discard Changes",
-                        message: "Are you sure you want to discard changes?",
-                        onYes: () {
-                          Navigator.pop(context);
-                          Navigator.pop(context);
-                          // Add discard logic if needed
-                        },
-                        onNo: () => Navigator.pop(context),
-                      ),
-                );
-              },
-              isPrimary: false,
-            ),
-            const SizedBox(width: 12),
-            _buildButton(
-              isService ? "Add Service" : "Add Product",
-              onTap: () {
-                productController.submitForm(isService: isService);
-              },
-            ),
-          ],
+      bottomNavigationBar: Obx(
+        () => Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(width: 12),
+              productController.isLoading.value
+                  ? SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: CircularProgressIndicator(
+                      color: AppColor.textColorPrimary,
+                      strokeWidth: 4,
+                    ),
+                  )
+                  : _buildButton(
+                    isService ? "Add Service" : "Add Product",
+                    onTap: () {
+                      if (!productController.isLoading.value) {
+                        productController.submitForm(isService: isService);
+                      }
+                    },
+                  ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildTextField(
-    String label,
-    TextEditingController controller, {
-    bool isNumber = false,
-    int maxLines = 1,
-  }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 20),
-      child: TextFormField(
-        controller: controller,
-        keyboardType: isNumber ? TextInputType.number : TextInputType.text,
-        maxLines: maxLines,
-        cursorColor: Colors.black,
-        style: const TextStyle(color: Colors.black),
-        decoration: InputDecoration(
-          labelText: "$label *",
-          labelStyle: const TextStyle(color: Colors.black),
-          filled: true,
-          fillColor: Colors.white,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 20,
-            vertical: 18,
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: Colors.grey),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: Colors.black, width: 1.5),
-          ),
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
-        ),
-        validator:
-            (value) =>
-                value == null || value.trim().isEmpty
-                    ? "$label is required"
-                    : null,
-      ),
-    );
-  }
+  // Widget _buildTextField(
+  //   String label,
+  //   TextEditingController controller, {
+  //   bool isNumber = false,
+  //   int maxLines = 1,
+  // }) {
+  //   return Padding(
+  //     padding: const EdgeInsets.only(bottom: 20),
+  //     child: TextFormField(
+  //       controller: controller,
+  //       keyboardType: isNumber ? TextInputType.number : TextInputType.text,
+  //       maxLines: maxLines,
+  //       cursorColor: Colors.black,
+  //       style: const TextStyle(color: Colors.black),
+  //       decoration: InputDecoration(
+  //         labelText: "$label *",
+  //         labelStyle: const TextStyle(color: Colors.black),
+  //         filled: true,
+  //         fillColor: Colors.white,
+  //         contentPadding: const EdgeInsets.symmetric(
+  //           horizontal: 20,
+  //           vertical: 18,
+  //         ),
+  //         enabledBorder: OutlineInputBorder(
+  //           borderRadius: BorderRadius.circular(14),
+  //           borderSide: const BorderSide(color: Colors.grey),
+  //         ),
+  //         focusedBorder: OutlineInputBorder(
+  //           borderRadius: BorderRadius.circular(14),
+  //           borderSide: const BorderSide(color: Colors.black, width: 1.5),
+  //         ),
+  //         border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+  //       ),
+  //       validator:
+  //           (value) =>
+  //               value == null || value.trim().isEmpty
+  //                   ? "$label is required"
+  //                   : null,
+  //     ),
+  //   );
+  // }
 
   Widget _buildDropdown(
     String label,

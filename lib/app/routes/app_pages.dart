@@ -10,6 +10,7 @@ import '../views/invoices/invoice_preview_screen.dart';
 import '../views/invoices/view_invoice.dart';
 import '../views/plans/plans_screen.dart';
 import '../views/product/add_product.dart';
+import '../views/product/add_service.dart';
 import '../views/product/edit_product_screen.dart';
 import '../views/product/view_product.dart';
 import '../views/profile/edit_profile/edit_profile_screen.dart';
@@ -48,6 +49,7 @@ class AppPages {
 
     // Product
     GetPage(name: Routes.addProductScreen, page: () => AddProductScreen()),
+    GetPage(name: Routes.addServiceScreen, page: () => AddServiceScreen()),
     GetPage(name: Routes.viewProductScreen, page: () => ViewProductScreen()),
     GetPage(name: Routes.editProductScreen, page: () => EditProductScreen()),
 

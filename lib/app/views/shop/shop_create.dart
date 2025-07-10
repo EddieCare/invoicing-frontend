@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../components/input_fld.dart';
 import '../../../values/values.dart';
 import '../../controllers/shop/shop_controller.dart';
 
@@ -14,6 +15,8 @@ void showCreateShopBottomSheet(BuildContext context) {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController phoneController = TextEditingController();
   final TextEditingController addressController = TextEditingController();
+
+  final controller = Get.find<ShopController>();
 
   showModalBottomSheet(
     context: context,
@@ -53,23 +56,23 @@ void showCreateShopBottomSheet(BuildContext context) {
               ),
               // Divider(thickness: 1),
               SizedBox(height: 50),
-              _buildInput(nameController, "Shop Name"),
-              _buildInput(shopImageUrl, "Shop Photo Link"),
+              buildInputField(nameController, "Shop Name"),
+              buildInputField(shopImageUrl, "Shop Photo Link"),
               // _buildInput(gstController, "GST Number"),
-              _buildInput(taxController, "Tax Number"),
-              _buildInput(typeController, "Shop Type"),
-              _buildInput(categoryController, "Shop Category"),
-              _buildInput(
+              buildInputField(taxController, "Tax Number"),
+              buildInputField(typeController, "Shop Type"),
+              buildInputField(categoryController, "Shop Category"),
+              buildInputField(
                 emailController,
                 "Shop Email",
                 keyboardType: TextInputType.emailAddress,
               ),
-              _buildInput(
+              buildInputField(
                 phoneController,
                 "Shop Phone",
                 keyboardType: TextInputType.phone,
               ),
-              _buildInput(
+              buildInputField(
                 addressController,
                 "Shop Address (Street, City, State, Zip, Country)",
                 maxLines: 2,
@@ -79,6 +82,7 @@ void showCreateShopBottomSheet(BuildContext context) {
                 width: double.infinity,
                 child: ElevatedButton(
                   onPressed: () {
+                    // final controller = Get.find<ShopController>();
                     final data = {
                       "shop_name": nameController.text.trim(),
                       "shop_image_link": shopImageUrl.text.trim(),
@@ -96,24 +100,34 @@ void showCreateShopBottomSheet(BuildContext context) {
                         "country": "",
                       },
                     };
-                    final controller = Get.find<ShopController>();
-                    controller.createShop(data);
+                    if (!controller.isLoading.value)
+                      controller.createShop(data);
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
+                    backgroundColor:
+                        controller.isLoading.value
+                            ? AppColor.pageColor
+                            : Colors.black,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(30),
                     ),
                     padding: EdgeInsets.symmetric(vertical: 16),
                   ),
-                  child: Text(
-                    "Create Shop",
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
+                  child:
+                      controller.isLoading.value
+                          ? Center(
+                            child: CircularProgressIndicator(
+                              color: AppColor.textColorPrimary,
+                            ),
+                          )
+                          : Text(
+                            "Create Shop",
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
                 ),
               ),
               SizedBox(height: 20),
@@ -125,33 +139,33 @@ void showCreateShopBottomSheet(BuildContext context) {
   );
 }
 
-Widget _buildInput(
-  TextEditingController controller,
-  String label, {
-  TextInputType keyboardType = TextInputType.text,
-  int maxLines = 1,
-}) {
-  return Padding(
-    padding: const EdgeInsets.only(bottom: 16),
-    child: TextFormField(
-      controller: controller,
-      keyboardType: keyboardType,
-      maxLines: maxLines,
-      validator:
-          (value) =>
-              value == null || value.trim().isEmpty
-                  ? 'This field is required'
-                  : null,
-      decoration: InputDecoration(
-        labelText: label,
-        filled: true,
-        fillColor: Colors.white,
-        contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide.none,
-        ),
-      ),
-    ),
-  );
-}
+// Widget _buildInput(
+//   TextEditingController controller,
+//   String label, {
+//   TextInputType keyboardType = TextInputType.text,
+//   int maxLines = 1,
+// }) {
+//   return Padding(
+//     padding: const EdgeInsets.only(bottom: 16),
+//     child: TextFormField(
+//       controller: controller,
+//       keyboardType: keyboardType,
+//       maxLines: maxLines,
+//       validator:
+//           (value) =>
+//               value == null || value.trim().isEmpty
+//                   ? 'This field is required'
+//                   : null,
+//       decoration: InputDecoration(
+//         labelText: label,
+//         filled: true,
+//         fillColor: Colors.white,
+//         contentPadding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+//         border: OutlineInputBorder(
+//           borderRadius: BorderRadius.circular(10),
+//           borderSide: BorderSide.none,
+//         ),
+//       ),
+//     ),
+//   );
+// }

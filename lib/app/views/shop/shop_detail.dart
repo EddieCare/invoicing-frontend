@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import '../../../components/dialogs.dart';
 import '../../../components/top_bar.dart';
 import '../../../values/values.dart';
 
@@ -41,8 +42,6 @@ class ShopDetailScreen extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: Image.network(
-                  // shopData['shop_image_link'] ??
-                  //     'https://img.freepik.com/premium-vector/isolated-cartoon-vector-store-building-front-icon_1138841-28041.jpg',
                   'https://img.freepik.com/premium-vector/isolated-cartoon-vector-store-building-front-icon_1138841-28041.jpg',
                   height: 200,
                   width: MediaQuery.of(context).size.width * 0.9,
@@ -134,6 +133,29 @@ class ShopDetailScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 32),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                // Edit Button
+                ElevatedButton.icon(
+                  // onPressed: () => controller.editProduct(item),
+                  onPressed: () => {},
+                  icon: const Icon(Icons.edit, color: Colors.white),
+                  label: const Text('Edit'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 16,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
