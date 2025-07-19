@@ -17,8 +17,6 @@ class VendorDetailsController extends GetxController {
   final categoryController = TextEditingController();
   final businessTypeController = TextEditingController();
   final fullNameController = TextEditingController();
-  // final firstNameController = TextEditingController();
-  // final lastNameController = TextEditingController();
 
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -32,7 +30,6 @@ class VendorDetailsController extends GetxController {
       emailController.text = user.email ?? '';
       nameController.text = user.displayName ?? '';
 
-      // Optional: Split displayName into firstName and lastName
       final fullName = user.displayName ?? '';
       final nameParts = fullName.split(" ");
       final firstName = nameParts.isNotEmpty ? nameParts.first : '';
@@ -40,8 +37,6 @@ class VendorDetailsController extends GetxController {
           nameParts.length > 1 ? nameParts.sublist(1).join(" ") : '';
 
       fullNameController.text = "$firstName $lastName";
-      // firstNameController.text = firstName;
-      // lastNameController.text = lastName;
     }
   }
 
@@ -59,8 +54,7 @@ class VendorDetailsController extends GetxController {
     final vendorData = {
       "uid": uid,
       "fullName": fullNameController.text.trim(),
-      // "firstName": firstNameController.text.trim(),
-      // "lastName": lastNameController.text.trim(),
+      "profileAvatar": "1",
       "name": nameController.text.trim(),
       "email": emailController.text.trim(),
       "phone": phoneController.text.trim(),
@@ -76,6 +70,8 @@ class VendorDetailsController extends GetxController {
       "businessType": businessTypeController.text.trim(),
       "isActive": true,
       "isSubscribed": false,
+      "isArchived": false,
+      "planType": "FREE",
       "createdAt": FieldValue.serverTimestamp(),
       "updatedAt": FieldValue.serverTimestamp(),
       "createdBy": uid,

@@ -34,7 +34,7 @@ class AuthMainController extends GetxController {
 
       await _handleFirstTimeLogin(user);
     } catch (e) {
-      Get.snackbar("Error", e.toString());
+      Get.snackbar("Error", "Something Went wrong");
     }
   }
 
@@ -48,10 +48,22 @@ class AuthMainController extends GetxController {
     } else {
       // Redirect to plan selection if needed
       final isActive = doc['isActive'] ?? false;
-      if (!isActive) {
+      final isArchived = doc['isArchived'] ?? false;
+      final isSubscribed = doc['isSubscribed'] ?? false;
+      if (!isActive || isArchived) {
+        Get.snackbar(
+          "Your account is paused",
+          "No account activvities can be done",
+        );
+        Get.offAllNamed(Routes.authMain);
+        return;
+      }
+      if (!isSubscribed) {
         Get.offAllNamed(Routes.plansScreen);
+        return;
       } else {
         Get.offAllNamed(Routes.baseScreen);
+        return;
       }
     }
   }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:invoicedaily/app/routes/app_routes.dart';
 import '../../../components/top_bar.dart';
 import '../../../values/values.dart';
 
@@ -20,12 +21,24 @@ class SubscriptionPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       backgroundColor: AppColor.pageColor,
       appBar: TopBar(
         title: "Manage Plans",
         showBackButton: true,
         showAddInvoice: false,
+        actions: [
+          TextButton(
+            onPressed: () {
+              Get.toNamed(Routes.baseScreen);
+            },
+            child: const Text(
+              "Skip for now",
+              style: TextStyle(color: Colors.black),
+            ),
+          ),
+        ],
       ),
       body: Obx(
         () => Column(

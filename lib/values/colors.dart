@@ -14,6 +14,6 @@ class AppColor {
   static const Color textColorSecondary = Color(0x99090F47);
 
   // Button Color
-  static const Color buttonColor = Color(0xFFF9FCF8);
+  static const Color buttonColor = Color.fromARGB(255, 36, 36, 36);
   static const Color buttonTextColor = Color(0xFFF9FCF8);
 }
