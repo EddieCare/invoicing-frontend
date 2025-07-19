@@ -533,6 +533,8 @@ class SubscriptionPage extends StatelessWidget {
       backgroundColor: const Color(0xfff9f9f9),
       appBar: TopBar(
         title: "Manage Plans",
+        showBackButton: true,
+        showAddInvoice: false,
         actions: [
           TextButton(
             onPressed: () => Get.back(),
@@ -597,9 +599,28 @@ class SubscriptionPage extends StatelessWidget {
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         const Text("Monthly"),
-        Switch(
-          value: controller.isYearly.value,
-          onChanged: (val) => controller.isYearly.value = val,
+        // Switch(
+        //   value: controller.isYearly.value,
+        //   onChanged: (val) => controller.isYearly.value = val,
+        // ),
+        Row(
+          children: [
+            Flexible(
+              child: _PriceBox(
+                title: 'Yearly Plan',
+                subtitle: '11.99 \$ /Month',
+              ),
+            ),
+            if (controller.isYearly.value) const SizedBox(width: 16),
+            if (controller.isYearly.value)
+              Flexible(
+                child: _PriceBox(
+                  title: 'Yearly Plan',
+                  subtitle: 'Yearly',
+                  highlight: true,
+                ),
+              ),
+          ],
         ),
         const Text("Yearly"),
       ],
