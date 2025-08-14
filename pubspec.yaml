@@ -29,6 +29,12 @@ dependencies:
   cloud_firestore: ^5.6.8
   google_sign_in: ^6.3.0
 
+  # OTP
+  pin_code_fields:
+
+  # Pay Integrations
+  in_app_purchase: ^3.1.7
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -43,6 +49,7 @@ flutter:
     - assets/images/
     - assets/flags/
     - assets/icons/
+    - assets/icons/avatars/
     - assets/lottie/
 
   # fonts:

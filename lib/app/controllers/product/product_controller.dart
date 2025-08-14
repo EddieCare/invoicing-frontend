@@ -8,6 +8,7 @@ import '../../routes/app_routes.dart';
 class ProductController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final RxString selectedFilter = 'All'.obs;
+  final RxBool isLoading = false.obs;
 
   RxList<Map<String, dynamic>> items = <Map<String, dynamic>>[].obs;
 
@@ -26,8 +27,8 @@ class ProductController extends GetxController {
   final supplierContactController = TextEditingController();
 
   final RxString selectedCategory = ''.obs;
-  final RxString selectedStatus = ''.obs;
-  final List<String> categoryOptions = ['Electronics', 'Grocery'];
+  RxString selectedStatus = ''.obs;
+  RxList<String> categoryOptions = <String>[""].obs;
   final List<String> statusOptions = ['Active', 'Inactive'];
 
   void resetForm() {
@@ -45,8 +46,30 @@ class ProductController extends GetxController {
     selectedStatus.value = '';
   }
 
+  Future<void> fetchCategories(isService) async {
+    final doc =
+        await _firestore.collection('config').doc('dynamicContent').get();
+
+    final data = doc..data();
+    final serviceCategories = data['service_categories'];
+    final productCategories = data['product_categories'];
+
+    print("Here is the Doc--: > $productCategories ${selectedFilter.value}");
+    categoryOptions.value = [...productCategories];
+
+    if (!isService) {
+      categoryOptions.value = [...productCategories];
+      // print([...productCategories]);
+    }
+    if (isService) {
+      categoryOptions.value = [...serviceCategories];
+    }
+
+    update();
+  }
+
   Future<void> submitForm({bool isService = false}) async {
-    // if (!formKey.currentState!.validate()) return;
+    isLoading.value = true;
 
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) {
@@ -72,7 +95,6 @@ class ProductController extends GetxController {
     final shopId = shopSnapshot.docs.first.id;
     final collection = isService ? 'services' : 'products';
 
-    print("Product =--=-=-=-=-=-=> $email, $shopId, $collection");
     final itemData = {
       'name': nameController.text.trim(),
       'image_link': imageLink.text.trim(),
@@ -113,18 +135,22 @@ class ProductController extends GetxController {
         isService
             ? "Service added successfully!"
             : "Product added successfully!",
-        snackPosition: SnackPosition.BOTTOM,
+        snackPosition: SnackPosition.TOP,
       );
+
+      isLoading.value = false;
 
       resetForm();
       Get.back();
-      fetchItems(); // Refresh
+      fetchItems();
     } catch (e) {
       Get.snackbar(
         "Error",
         "Failed to add item: $e",
         snackPosition: SnackPosition.BOTTOM,
       );
+    } finally {
+      isLoading.value = false;
     }
   }
 
@@ -173,14 +199,14 @@ class ProductController extends GetxController {
       items.addAll(serviceSnap.docs.map((e) => {"id": e.id, ...e.data()}));
     }
 
-    update(); // For GetBuilder
+    update();
   }
 
   void deleteProduct(Map<String, dynamic> item) async {
     try {
       final email = FirebaseAuth.instance.currentUser!.email;
-      final shopId = item["shopId"]; // Implement this based on your logic
-      print(shopId + "------" + email + "------------------");
+      final shopId = item["shopId"];
+
       await FirebaseFirestore.instance
           .collection("vendors")
           .doc(email)
@@ -217,6 +243,7 @@ class ProductController extends GetxController {
   @override
   void onInit() {
     fetchItems();
+    // fetchCategories();
     super.onInit();
   }
 }

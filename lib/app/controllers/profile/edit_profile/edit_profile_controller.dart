@@ -59,33 +59,26 @@ class EditProfileController extends GetxController {
     }
 
     try {
-      await _firestore.collection('vendors').doc(user.email).update({
-        'fullName': fullNameController.text.trim(),
-        'businessName': businessNameController.text.trim(),
-        'email': emailController.text.trim(),
-        'phone': phoneController.text.trim(),
-        'address': addressController.text.trim(),
-        'country': selectedCountry.value,
-        'updatedAt': FieldValue.serverTimestamp(),
-      });
-      Get.snackbar(
-        'Success',
-        'Profile updated successfully!',
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.green,
-        colorText: Colors.white,
-      );
-      btnLoading.value = false;
-
-      Get.back();
+      await _firestore
+          .collection('vendors')
+          .doc(user.email)
+          .update({
+            'fullName': fullNameController.text.trim(),
+            'businessName': businessNameController.text.trim(),
+            'email': emailController.text.trim(),
+            'phone': phoneController.text.trim(),
+            'address': addressController.text.trim(),
+            'country': selectedCountry.value,
+            'updatedAt': FieldValue.serverTimestamp(),
+          })
+          .then((d) async {
+            btnLoading.value = false;
+            fetchProfileData();
+            Get.back();
+            Get.snackbar('Success', 'Profile updated successfully!');
+          });
     } catch (e) {
-      Get.snackbar(
-        'Error',
-        'Failed to update profile',
-        snackPosition: SnackPosition.TOP,
-        backgroundColor: Colors.red,
-        colorText: Colors.white,
-      );
+      Get.snackbar('Error', 'Failed to update profile');
     } finally {
       btnLoading.value = false;
     }

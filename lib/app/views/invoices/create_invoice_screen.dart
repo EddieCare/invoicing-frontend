@@ -202,38 +202,50 @@ class CreateInvoiceScreen extends StatelessWidget {
     removeItem, {
     bool highlighted = false,
   }) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 4),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: highlighted ? Colors.white : Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(12),
-        border: highlighted ? Border.all(color: Colors.blue) : null,
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
-              Text(subtitle, style: TextStyle(color: Colors.black54)),
-            ],
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Container(
+          width: MediaQuery.of(Get.context!).size.width - 100,
+          margin: const EdgeInsets.symmetric(vertical: 4),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade100,
+            borderRadius: BorderRadius.circular(12),
           ),
-          Row(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(price, style: TextStyle(fontWeight: FontWeight.bold)),
-              IconButton(
-                onPressed: removeItem,
-                icon: Icon(
-                  Icons.delete_outline_outlined,
-                  color: Colors.red[400],
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
+                  Text(subtitle, style: TextStyle(color: Colors.black54)),
+                ],
+              ),
+              Row(
+                children: [
+                  Text(price, style: TextStyle(fontWeight: FontWeight.bold)),
+                ],
               ),
             ],
           ),
-        ],
-      ),
+        ),
+        const SizedBox(width: 8),
+        Container(
+          width: 60,
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(255, 255, 154, 154).withAlpha(100),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: IconButton(
+            onPressed: removeItem,
+            icon: Icon(Icons.delete_outline_outlined, color: Colors.red[400]),
+          ),
+        ),
+      ],
     );
   }
 
@@ -243,49 +255,63 @@ class CreateInvoiceScreen extends StatelessWidget {
     String price,
     removeItem,
   ) {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: 6),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: Colors.black,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Container(
+          width: MediaQuery.of(Get.context!).size.width - 100,
+          margin: const EdgeInsets.symmetric(vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          decoration: BoxDecoration(
+            color: Colors.black,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisSize: MainAxisSize.max,
             children: [
-              Text(
-                title,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                  Text(subtitle, style: TextStyle(color: Colors.white70)),
+                ],
               ),
-              Text(subtitle, style: TextStyle(color: Colors.white70)),
+              Row(
+                children: [
+                  Text(
+                    price,
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
-          Row(
-            children: [
-              Text(
-                price,
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-              IconButton(
-                onPressed: removeItem,
-                icon: Icon(
-                  Icons.delete_outline_outlined,
-                  color: Colors.red[400],
-                ),
-              ),
-            ],
+        ),
+        const SizedBox(width: 8),
+        Container(
+          width: 60,
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(255, 255, 154, 154).withAlpha(100),
+            borderRadius: BorderRadius.circular(12),
           ),
-        ],
-      ),
+          child: IconButton(
+            onPressed: removeItem,
+            icon: Icon(Icons.delete_outline_outlined, color: Colors.red[400]),
+          ),
+        ),
+      ],
     );
   }
 
@@ -493,7 +519,6 @@ class CreateInvoiceScreen extends StatelessWidget {
 
   void _showProductPopup(InvoiceController controller) {
     final RxMap<String, int> tempQuantities = <String, int>{}.obs;
-
     // Pre-fill with selected product quantities
     for (var p in controller.selectedProducts) {
       final id = p['id'] ?? p['name'];
@@ -507,75 +532,138 @@ class CreateInvoiceScreen extends StatelessWidget {
           color: Colors.white,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         ),
-        child: Obx(
-          () => ListView(
-            shrinkWrap: true,
-            children:
-                controller.allProducts.map((product) {
-                  final productId = product['id'] ?? product['name'];
-                  final qty = tempQuantities[productId] ?? 0;
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              margin: const EdgeInsets.only(bottom: 6),
+              width: 50,
+              height: 5,
+              decoration: BoxDecoration(
+                color: Colors.black12,
+                borderRadius: BorderRadius.circular(50),
+              ),
+            ),
+            // Handle the case where no products are available
+            if (controller.allProducts.isEmpty)
+              Center(
+                child: Text(
+                  "No products available. Please add products first.",
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+            const SizedBox(height: 16),
+            // Title
+            const SizedBox(height: 8),
+            const Text(
+              "Select Products",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            // Add a searchbar to filter products
+            TextField(
+              decoration: InputDecoration(
+                hintText: "Search products",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
+              ),
+              onChanged: (value) {
+                print("Search query: $value");
+                controller.sortProductsByQuery(value.trim());
+              },
+            ),
+            const SizedBox(height: 16),
 
-                  return ListTile(
-                    title: Text(product['name']),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("₹${product['price']}"),
-                        const SizedBox(height: 8),
-                      ],
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.remove_circle_outline),
-                          onPressed:
-                              qty > 0
-                                  ? () {
-                                    tempQuantities[productId] = qty - 1;
-                                    tempQuantities.refresh();
-                                  }
-                                  : null,
-                        ),
-                        Text('$qty'),
-                        IconButton(
-                          icon: const Icon(Icons.add_circle_outline),
-                          onPressed: () {
-                            tempQuantities[productId] = qty + 1;
-                            tempQuantities.refresh();
-                          },
-                        ),
-                        const SizedBox(width: 8),
-                        ElevatedButton(
-                          style: ButtonStyle(
-                            backgroundColor: WidgetStateProperty.all(
-                              Colors.black,
-                            ),
-                            shape: WidgetStateProperty.all(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
+            // Display products in a list
+            Obx(
+              () => SingleChildScrollView(
+                child: ListView(
+                  shrinkWrap: true,
+                  children:
+                      controller.allProducts.map((product) {
+                        final productId = product['id'] ?? product['name'];
+                        final qty = tempQuantities[productId] ?? 0;
+                        return ListTile(
+                          title: Text(product['name']),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("₹${product['price']}"),
+                              const SizedBox(height: 8),
+                            ],
+                          ),
+                          trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.remove_circle_outline),
+                                onPressed:
+                                    qty > 0
+                                        ? () {
+                                          tempQuantities[productId] = qty - 1;
+                                          tempQuantities.refresh();
+                                        }
+                                        : null,
                               ),
-                            ),
+                              Text('$qty'),
+                              IconButton(
+                                icon: const Icon(Icons.add_circle_outline),
+                                onPressed: () {
+                                  tempQuantities[productId] = qty + 1;
+                                  tempQuantities.refresh();
+                                },
+                              ),
+                              const SizedBox(width: 8),
+                              ElevatedButton(
+                                style: ButtonStyle(
+                                  backgroundColor: WidgetStateProperty.all(
+                                    Colors.black,
+                                  ),
+                                  shape: WidgetStateProperty.all(
+                                    RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
+                                  ),
+                                ),
+                                onPressed:
+                                    () => {
+                                      controller.selectedProducts.clear(),
+                                      tempQuantities.forEach((id, qty) {
+                                        if (qty > 0) {
+                                          final product = controller.allProducts
+                                              .firstWhere(
+                                                (p) =>
+                                                    (p['id'] ?? p['name']) ==
+                                                    id,
+                                              );
+                                          controller.selectedProducts.add({
+                                            ...product,
+                                            'quantity': qty,
+                                          });
+                                        }
+                                      }),
+
+                                      controller.updateTotals(),
+                                      // Get.back(),
+                                    },
+                                child: const Text(
+                                  "Add",
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                              ),
+                            ],
                           ),
-                          onPressed:
-                              qty > 0
-                                  ? () {
-                                    controller.addProduct({
-                                      ...product,
-                                      'quantity': qty,
-                                    });
-                                  }
-                                  : null,
-                          child: const Text(
-                            "Add",
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                }).toList(),
-          ),
+                        );
+                      }).toList(),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -583,6 +671,7 @@ class CreateInvoiceScreen extends StatelessWidget {
 
   void _showServicePopup(InvoiceController controller) {
     final RxMap<String, int> tempQuantities = <String, int>{}.obs;
+    controller.fetchProductsAndServices();
 
     // Pre-fill with selected service quantities
     for (var s in controller.selectedServices) {
@@ -597,75 +686,135 @@ class CreateInvoiceScreen extends StatelessWidget {
           color: Colors.white,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         ),
-        child: Obx(
-          () => ListView(
-            shrinkWrap: true,
-            children:
-                controller.allServices.map((service) {
-                  final serviceId = service['id'] ?? service['name'];
-                  final qty = tempQuantities[serviceId] ?? 0;
+        child: Column(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(16),
+              margin: const EdgeInsets.only(bottom: 6),
+              width: 50,
+              height: 5,
+              decoration: BoxDecoration(
+                color: Colors.black12,
+                borderRadius: BorderRadius.circular(50),
+              ),
+            ),
+            // Handle the case where no products are available
+            if (controller.allProducts.isEmpty)
+              Center(
+                child: Text(
+                  "No services available. Please add services first.",
+                  style: TextStyle(color: Colors.red),
+                ),
+              ),
+            const SizedBox(height: 16),
+            // Title
+            const SizedBox(height: 8),
+            const Text(
+              "Select Services",
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            // Add a searchbar to filter products
+            TextField(
+              decoration: InputDecoration(
+                hintText: "Search services",
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 14,
+                ),
+              ),
+              onChanged: (value) {
+                print("Search query: $value");
+                controller.sortServicesByQuery(value.trim());
+              },
+            ),
+            const SizedBox(height: 16),
 
-                  return ListTile(
-                    title: Text(service['name']),
-                    subtitle: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("₹${service['price']}"),
-                        const SizedBox(height: 8),
-                      ],
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.remove_circle_outline),
-                          onPressed:
-                              qty > 0
-                                  ? () {
-                                    tempQuantities[serviceId] = qty - 1;
-                                    tempQuantities.refresh();
-                                  }
-                                  : null,
+            Obx(
+              () => ListView(
+                shrinkWrap: true,
+                children:
+                    controller.allServices.map((service) {
+                      final serviceId = service['id'] ?? service['name'];
+                      final qty = tempQuantities[serviceId] ?? 0;
+
+                      return ListTile(
+                        title: Text(service['name']),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("₹${service['price']}"),
+                            const SizedBox(height: 8),
+                          ],
                         ),
-                        Text('$qty'),
-                        IconButton(
-                          icon: const Icon(Icons.add_circle_outline),
-                          onPressed: () {
-                            tempQuantities[serviceId] = qty + 1;
-                            tempQuantities.refresh();
-                          },
-                        ),
-                        const SizedBox(width: 8),
-                        ElevatedButton(
-                          style: ButtonStyle(
-                            backgroundColor: WidgetStateProperty.all(
-                              Colors.black,
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.remove_circle_outline),
+                              onPressed:
+                                  qty > 0
+                                      ? () {
+                                        tempQuantities[serviceId] = qty - 1;
+                                        tempQuantities.refresh();
+                                      }
+                                      : null,
                             ),
-                            shape: WidgetStateProperty.all(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
+                            Text('$qty'),
+                            IconButton(
+                              icon: const Icon(Icons.add_circle_outline),
+                              onPressed: () {
+                                tempQuantities[serviceId] = qty + 1;
+                                tempQuantities.refresh();
+                              },
+                            ),
+                            const SizedBox(width: 8),
+                            ElevatedButton(
+                              style: ButtonStyle(
+                                backgroundColor: WidgetStateProperty.all(
+                                  Colors.black,
+                                ),
+                                shape: WidgetStateProperty.all(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              ),
+                              onPressed:
+                                  () => {
+                                    controller.selectedServices.clear(),
+                                    tempQuantities.forEach((id, qty) {
+                                      if (qty > 0) {
+                                        final service = controller.allServices
+                                            .firstWhere(
+                                              (p) =>
+                                                  (p['id'] ?? p['name']) == id,
+                                            );
+                                        controller.selectedServices.add({
+                                          ...service,
+                                          'quantity': qty,
+                                        });
+                                      }
+                                    }),
+
+                                    controller.updateTotals(),
+                                    // Get.back(),
+                                  },
+                              child: const Text(
+                                "Add",
+                                style: TextStyle(color: Colors.white),
                               ),
                             ),
-                          ),
-                          onPressed:
-                              qty > 0
-                                  ? () {
-                                    controller.addService({
-                                      ...service,
-                                      'quantity': qty,
-                                    });
-                                  }
-                                  : null,
-                          child: const Text(
-                            "Add",
-                            style: TextStyle(color: Colors.white),
-                          ),
+                          ],
                         ),
-                      ],
-                    ),
-                  );
-                }).toList(),
-          ),
+                      );
+                    }).toList(),
+              ),
+            ),
+          ],
         ),
       ),
     );

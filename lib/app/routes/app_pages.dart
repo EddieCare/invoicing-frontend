@@ -3,6 +3,7 @@ import 'package:invoicedaily/app/views/shop/shop_detail.dart';
 
 import '../views/auth/auth_main.dart';
 import '../views/auth/business_detail_screen.dart';
+import '../views/auth/otp_verification.dart';
 import '../views/auth/signup_screen.dart';
 import '../views/base/base_screen.dart';
 import '../views/invoices/create_invoice_screen.dart';
@@ -10,6 +11,7 @@ import '../views/invoices/invoice_preview_screen.dart';
 import '../views/invoices/view_invoice.dart';
 import '../views/plans/plans_screen.dart';
 import '../views/product/add_product.dart';
+import '../views/product/add_service.dart';
 import '../views/product/edit_product_screen.dart';
 import '../views/product/view_product.dart';
 import '../views/profile/edit_profile/edit_profile_screen.dart';
@@ -48,6 +50,7 @@ class AppPages {
 
     // Product
     GetPage(name: Routes.addProductScreen, page: () => AddProductScreen()),
+    GetPage(name: Routes.addServiceScreen, page: () => AddServiceScreen()),
     GetPage(name: Routes.viewProductScreen, page: () => ViewProductScreen()),
     GetPage(name: Routes.editProductScreen, page: () => EditProductScreen()),
 
@@ -55,6 +58,12 @@ class AppPages {
     GetPage(
       name: Routes.shopDetailScreen,
       page: () => ShopDetailScreen(shopData: Get.arguments),
+    ),
+
+    // OTP
+    GetPage(
+      name: Routes.emailOtpVerification,
+      page: () => EmailOtpVerificationPage(),
     ),
   ];
 }

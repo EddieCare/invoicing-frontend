@@ -35,6 +35,11 @@ class SplashController extends GetxController {
       return;
     }
 
+    if (!user.emailVerified) {
+      Get.toNamed(Routes.emailOtpVerification);
+      return;
+    }
+
     final uid = user.uid;
     final email = user.email;
 
@@ -49,16 +54,21 @@ class SplashController extends GetxController {
 
       final data = vendorDoc.data();
       final isSubscribed = data?['isSubscribed'] ?? false;
+      final isArchived = data?['isArchived'] ?? true;
+      final isActive = data?['isActive'] ?? false;
 
-      if (isSubscribed) {
-        Get.offNamed(Routes.baseScreen);
+      if (!isSubscribed) {
+        Get.offNamed(Routes.plansScreen);
+      }
+
+      if (isArchived || !isActive) {
+        Get.offNamed(Routes.authMain);
       } else {
-        // You could redirect to a subscription plan screen here if needed
-        Get.offNamed(Routes.baseScreen); // or Routes.subscriptionPlans
+        Get.offNamed(Routes.baseScreen);
       }
     } catch (e) {
       print("Error fetching vendor data: $e");
-      Get.offNamed(Routes.authMain); // fallback in case of error
+      Get.offNamed(Routes.authMain);
     }
   }
 }

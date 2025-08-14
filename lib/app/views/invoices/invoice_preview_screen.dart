@@ -21,36 +21,43 @@ class InvoicePreviewScreen extends StatelessWidget {
         showBackButton: true,
         showAddInvoice: false,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(vertical: 40),
+      body: Padding(
+        padding: const EdgeInsets.only(top: 20),
         child: Center(
           child: Container(
             width: isMobile ? double.infinity : 700,
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.symmetric(horizontal: 24),
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(30),
+              borderRadius: BorderRadius.circular(40),
+              border: Border.all(color: Colors.black12, width: 1),
               boxShadow: [
                 BoxShadow(color: Colors.black12.withAlpha(10), blurRadius: 30),
               ],
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _header(),
-                const SizedBox(height: 24),
-                _invoiceDetails(),
-                const Divider(height: 40),
-                _itemsTable(),
-                const Divider(height: 40),
-                _summary(),
-                const SizedBox(height: 24),
-                _customerDetails(),
-                const Divider(height: 40),
-                _disclaimer(),
-                const SizedBox(height: 24),
-                _actionButtons(context),
-              ],
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 24),
+                  _header(),
+                  const SizedBox(height: 24),
+                  _invoiceDetails(),
+                  const Divider(height: 40),
+                  _itemsTable(),
+                  const Divider(height: 40),
+                  _summary(),
+                  const SizedBox(height: 24),
+                  _customerDetails(),
+                  const SizedBox(height: 60),
+                  const Divider(height: 40, color: Color.fromARGB(15, 0, 0, 0)),
+                  _disclaimer(),
+                  const SizedBox(height: 24),
+                  _actionButtons(context),
+                  const SizedBox(height: 30),
+                ],
+              ),
             ),
           ),
         ),
@@ -68,32 +75,40 @@ class InvoicePreviewScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Make the id more prominent
+              const Text(
+                "Invoice ID",
+                style: TextStyle(fontSize: 15, color: Colors.black87),
+              ),
+              const SizedBox(height: 2),
               Text(
-                "INVOICE #${inv['invoice_number'] ?? '-'}",
-                style: TextStyle(fontWeight: FontWeight.w700, fontSize: 18),
+                "${inv['invoice_number'] ?? '-'}",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
               ),
               SizedBox(height: 12),
-              Text(
-                inv['shop_name'] ?? "Shop Name",
-                style: TextStyle(fontSize: 16),
-              ),
-              Text(inv['shop_address'] ?? "Address"),
-              Text(inv['shop_email'] ?? "email@example.com"),
-              Text(inv['shop_phone'] ?? "+1 000-0000"),
+              Text(inv['shop_name'] ?? "-", style: TextStyle(fontSize: 16)),
+              Text(inv['shop_address'] ?? "-"),
+              Text(inv['shop_email'] ?? "-"),
+              Text(inv['shop_phone'] ?? "-"),
             ],
           ),
         ),
         SizedBox(width: 12),
         Container(
-          margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-          padding: const EdgeInsets.all(10),
-          width: 32,
-          height: 32,
+          // margin: const EdgeInsets.all(4),
+          padding: const EdgeInsets.all(4),
+          width: 80,
+          height: 80,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(20),
-            color: Colors.black12,
+            // color: const Color.fromARGB(14, 0, 0, 0),
           ),
-          child: Image.asset('assets/images/logo.png', fit: BoxFit.contain),
+          child: Image.asset(
+            'assets/images/logo.png',
+            width: 150,
+            height: 150,
+            fit: BoxFit.contain,
+          ),
         ),
       ],
     );
@@ -102,29 +117,35 @@ class InvoicePreviewScreen extends StatelessWidget {
   Widget _invoiceDetails() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
+      children: [
         Text(
           "Invoice Details",
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
         ),
         SizedBox(height: 12),
-        _DetailRow(label: "Service Type", value: "Retail Product Sale"),
-        _DetailRow(label: "Payment Method", value: "Credit Card (Visa)"),
-        _DetailRow(label: "Transaction ID", value: "TXN-9876543210"),
+        _DetailRow(label: "Service Type", value: "Blue Collar"),
+        _DetailRow(label: "Payment Method", value: "Cash"),
+        _DetailRow(label: "Transaction ID", value: "-"),
         _DetailRow(
           label: "Issue Date & Time",
-          value: "March 4, 2025 | 10:30 AM",
+          // Date is a timestamp, format it to a readable string
+          value: controller.formatDateFromTimestamp(
+            controller.invoice['issue_date'] ?? "",
+          ),
         ),
         _DetailRow(
           label: "Due Date & Time",
-          value: "March 11, 2025 | 11:59 PM",
+          value: controller.formatDateFromTimestamp(
+            controller.invoice['due_date'] ?? "",
+          ),
         ),
       ],
     );
   }
 
   Widget _itemsTable() {
-    final items = controller.invoice['items'] ?? [];
+    final products = controller.invoice['products'] ?? [];
+    final services = controller.invoice['services'] ?? [];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -136,11 +157,17 @@ class InvoicePreviewScreen extends StatelessWidget {
         SizedBox(height: 16),
         _tableHeader(),
         SizedBox(height: 8),
-        for (var item in items)
+        for (var p in products)
           _tableRow(
-            item['quantity'].toString(),
-            item['name'],
-            '\$${item['total'].toStringAsFixed(2)}',
+            p['quantity'].toString(),
+            p['name'],
+            '\$${p['total'].toStringAsFixed(2)}',
+          ),
+        for (var s in services)
+          _tableRow(
+            s['quantity'].toString(),
+            s['name'],
+            '\$${s['total'].toStringAsFixed(2)}',
           ),
       ],
     );
@@ -237,13 +264,43 @@ class InvoicePreviewScreen extends StatelessWidget {
   }
 
   Widget _disclaimer() {
-    return const Text(
-      "• 1-year warranty on electronics.\n"
-      "• 30-day return/exchange window.\n"
-      "• 5% late fee after due date.\n"
-      "• Refunds take 7-10 business days.\n\n"
-      "Visit elitetech.com/terms for full details.",
-      style: TextStyle(fontSize: 14, height: 1.5),
+    return Padding(
+      padding: const EdgeInsets.only(top: 10, bottom: 20),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Disclaimer",
+            textAlign: TextAlign.start,
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+          ),
+          SizedBox(height: 12),
+          Text(
+            "• All payments are due upon receipt unless otherwise agreed.\n"
+            "• Late payments may incur additional charges or interest.\n"
+            "• This invoice is valid for 30 days from the date of issue.\n"
+            "• Goods/services listed are provided as described.\n"
+            "• All prices are in the stated currency unless specified otherwise.\n"
+            "• Disputes must be reported within 7 days of receipt.\n"
+            "• Taxes, if applicable, are included or stated separately.\n"
+            "• This invoice is computer generated and does not require a signature.\n"
+            "• Any applicable warranties are subject to terms.\n"
+            "• Returns or refunds are subject to company policy.\n"
+            "• Overdue invoices may be sent to collections.\n"
+            "• Bank charges, if any, are to be borne by the payer.\n"
+            "• Please ensure the invoice number is referenced in all payments.\n"
+            "• All services/products are subject to availability.\n"
+            "• The client is responsible for providing accurate billing details.\n"
+            "• Payment methods accepted are listed on the invoice.\n"
+            "• The company reserves the right to modify invoice terms.\n"
+            "• Delivery timelines are estimates unless guaranteed.\n"
+            "• Any modifications to the invoice must be approved in writing.\n"
+            "• Visit invoicedaily.com/terms for full details.",
+            style: TextStyle(fontSize: 14, height: 1.5, color: Colors.black38),
+          ),
+        ],
+      ),
     );
   }
 
@@ -251,7 +308,6 @@ class InvoicePreviewScreen extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _button(context, "Discard", Icons.close, Colors.red),
         _button(
           context,
           "Download PDF",

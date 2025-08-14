@@ -70,8 +70,9 @@ class ProductScreen extends StatelessWidget {
           color: AppColor.themeColor,
           onSelected: (value) {
             final isService = value == 'Service';
+            controller.fetchCategories(isService);
             Get.toNamed(
-              Routes.addProductScreen,
+              isService ? Routes.addServiceScreen : Routes.addProductScreen,
               arguments: {'isService': isService},
             );
           },

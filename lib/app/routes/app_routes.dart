@@ -21,9 +21,13 @@ abstract class Routes {
 
   // Product
   static const addProductScreen = '/addProductScreen';
+  static const addServiceScreen = '/addServiceScreen';
   static const viewProductScreen = '/viewProductScreen';
   static const editProductScreen = '/editProductScreen';
 
   // Product
   static const shopDetailScreen = '/shopDetailScreen';
+
+  // OTP
+  static const String emailOtpVerification = '/emailOtpVerification';
 }

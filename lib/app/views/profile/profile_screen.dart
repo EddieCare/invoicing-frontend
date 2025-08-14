@@ -36,154 +36,148 @@ class ProfileScreen extends StatelessWidget {
         ],
       ),
       body: SingleChildScrollView(
-        child: Column(
-          children: [
-            SizedBox(height: 20),
-            CircleAvatar(
-              radius: 50,
-              backgroundColor: Colors.grey.shade200,
-              child: Image.asset("assets/images/default_profile.png"),
-            ),
-            SizedBox(height: 12),
-            Text(
-              controller.vendorData.value?['name'] ?? 'Loading...',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            Text(
-              controller.vendorData.value?['email'] ?? '',
-              style: TextStyle(fontSize: 14, color: Colors.grey[700]),
-            ),
-            SizedBox(height: 10),
-            ElevatedButton(
-              onPressed: () {
-                Get.toNamed(Routes.editProfile);
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.black,
-                shape: StadiumBorder(),
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              ),
-              child: Text(
-                "Edit profile",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                  fontSize: 18,
-                ),
-              ),
-            ),
-            SizedBox(height: 20),
-            _buildSettingsCard(
-              context,
-              children: [
-                // _buildListTile(
-                //   Icons.edit,
-                //   "Edit profile information",
-                //   onTap: () => {Get.toNamed(Routes.editProfile)},
-                // ),
-                _buildListTile(
-                  Icons.notifications_none,
-                  "Notifications",
-                  trailing: Text("ON", style: TextStyle(color: Colors.green)),
-                  onTap: () => {Get.toNamed(Routes.notificationScreen)},
-                ),
-                _buildListTile(
-                  Icons.language,
-                  "Language",
-                  trailing: Text(
-                    "English",
-                    style: TextStyle(color: Colors.blue),
+        child: Obx(
+          () => Column(
+            children: [
+              SizedBox(height: 20),
+              CircleAvatar(
+                radius: 50,
+                backgroundColor: Colors.transparent,
+                // child: Image.asset("assets/images/default_profile.png"),
+                child: Center(
+                  child: Image.asset(
+                    "assets/icons/avatars/${(controller.vendorData.value?['profileAvatar'] ?? 16).toString()}.png",
+                    width: 80,
+                    height: 80,
                   ),
-                  onTap: () => {Get.toNamed(Routes.languageScreen)},
                 ),
-              ],
-            ),
-            _buildSettingsCard(
-              context,
-              children: [
-                _buildListTile(
-                  Icons.add_business_outlined,
-                  "View Shop",
-                  onTap: () => {shopController.checkAndViewOrCreateShop()},
+              ),
+              SizedBox(height: 12),
+              Text(
+                controller.vendorData.value?['name'] ?? 'Loading...',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              Text(
+                controller.vendorData.value?['email'] ?? '',
+                style: TextStyle(fontSize: 14, color: Colors.grey[700]),
+              ),
+              SizedBox(height: 10),
+              ElevatedButton(
+                onPressed: () {
+                  Get.toNamed(Routes.editProfile);
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black,
+                  shape: StadiumBorder(),
+                  padding: EdgeInsets.symmetric(horizontal: 18, vertical: 8),
                 ),
-              ],
-            ),
+                child: Text(
+                  "Edit profile",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              _buildSettingsCard(
+                context,
+                children: [
+                  _buildListTile(
+                    Icons.notifications_none,
+                    "Notifications",
+                    trailing: Text("ON", style: TextStyle(color: Colors.green)),
+                    onTap: () => {Get.toNamed(Routes.notificationScreen)},
+                  ),
+                  _buildListTile(
+                    Icons.language,
+                    "Language",
+                    trailing: Text(
+                      "English",
+                      style: TextStyle(color: Colors.blue),
+                    ),
+                    onTap: () => {Get.toNamed(Routes.languageScreen)},
+                  ),
+                ],
+              ),
+              _buildSettingsCard(
+                context,
+                children: [
+                  _buildListTile(
+                    Icons.add_business_outlined,
+                    "View Shop",
+                    onTap: () => {shopController.checkAndViewOrCreateShop()},
+                  ),
+                ],
+              ),
 
-            _buildSettingsCard(
-              context,
-              children: [
-                _buildListTile(
-                  Icons.receipt_long,
-                  "Manage Subscription",
-                  onTap: () => {Get.toNamed(Routes.plansScreen)},
-                ),
-                _buildListTile(
-                  Icons.restore_outlined,
-                  "Restore Purchases",
-                  onTap: () => {Get.toNamed(Routes.plansScreen)},
-                ),
-                _buildListTile(
-                  Icons.delete,
-                  "Delete Account",
-                  onTap: () => {Get.toNamed(Routes.plansScreen)},
-                ),
-              ],
-            ),
+              _buildSettingsCard(
+                context,
+                children: [
+                  _buildListTile(
+                    Icons.receipt_long,
+                    "Manage Subscription",
+                    onTap: () => {Get.toNamed(Routes.plansScreen)},
+                  ),
+                  _buildListTile(
+                    Icons.restore_outlined,
+                    "Restore Purchases",
+                    onTap: () => {Get.toNamed(Routes.plansScreen)},
+                  ),
+                  _buildListTile(
+                    Icons.delete,
+                    "Delete Account",
+                    onTap: () => controller.deleteAccountFlow(context),
+                  ),
+                ],
+              ),
 
-            // Spacer(),
-            SizedBox(height: 10),
-            _buildSettingsCard(
-              context,
-              cardTitle: "About",
-              children: [
-                // _buildListTile(Icons.support_agent, "About"),
-                _buildListTile(
-                  Icons.security,
-                  "App version ${Config.versionCode}",
-                ),
-                // _buildListTile(Icons.support_agent, "Help & Support"),
-                _buildListTile(
-                  Icons.chat_bubble_outline,
-                  "Contact us",
-                  onTap:
-                      () => launchWebUri(
-                        context: context,
-                        url: Config.contactUsLink,
-                        title: 'Contact Us',
-                      ),
-                ),
-                _buildListTile(
-                  Icons.lock_outline,
-                  "Privacy policy",
-                  onTap:
-                      () => launchWebUri(
-                        context: context,
-                        url: Config.privacyPolicyLink,
-                        title: 'Privacy Policy',
-                      ),
-                ),
-                _buildListTile(
-                  Icons.terminal_sharp,
-                  "Terms of Services",
-                  onTap:
-                      () => launchWebUri(
-                        context: context,
-                        url: Config.invoiceDailyLink,
-                        title: 'Terms of Services',
-                      ),
-                ),
-                _buildListTile(
-                  Icons.logout_sharp,
-                  "Logout",
-                  onTap: () async {
-                    await AuthController.to
-                        .signOut(); // Handles Firebase & Google logout
-                  },
-                ),
-              ],
-            ),
-            SizedBox(height: 50),
-          ],
+              // Spacer(),
+              SizedBox(height: 10),
+              _buildSettingsCard(
+                context,
+                cardTitle: "About",
+                children: [
+                  // _buildListTile(Icons.support_agent, "About"),
+                  _buildListTile(
+                    Icons.security,
+                    "App version ${Config.versionCode}",
+                  ),
+                  // _buildListTile(Icons.support_agent, "Help & Support"),
+                  _buildListTile(
+                    Icons.chat_bubble_outline,
+                    "Contact us",
+                    onTap:
+                        () => launchWebUri(
+                          context: context,
+                          url: Config.contactUsLink,
+                          title: 'Contact Us',
+                        ),
+                  ),
+                  _buildListTile(
+                    Icons.lock_outline,
+                    "Privacy policy",
+                    onTap:
+                        () => launchWebUri(
+                          context: context,
+                          url: Config.privacyPolicyLink,
+                          title: 'Privacy Policy',
+                        ),
+                  ),
+                  _buildListTile(
+                    Icons.logout_sharp,
+                    "Logout",
+                    onTap: () async {
+                      await AuthController.to
+                          .signOut(); // Handles Firebase & Google logout
+                    },
+                  ),
+                ],
+              ),
+              SizedBox(height: 50),
+            ],
+          ),
         ),
       ),
     );

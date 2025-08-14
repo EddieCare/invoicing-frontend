@@ -151,7 +151,7 @@ class SignupScreen extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      Image.asset("assets/images/arc1.png", width: 100),
+                      // Image.asset("assets/images/arc1.png", width: 100),
                       const SizedBox(height: 40),
                       CustomTextField(
                         label: "Email*",

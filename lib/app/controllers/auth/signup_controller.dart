@@ -15,6 +15,8 @@ class SignupController extends GetxController {
     final email = emailController.text.trim();
     final password = passwordController.text;
 
+    // Get.toNamed(Routes.emailOtpVerification);
+
     if (email.isEmpty || password.isEmpty) {
       Get.snackbar(
         "Error",
@@ -30,10 +32,25 @@ class SignupController extends GetxController {
       UserCredential userCredential = await _auth
           .createUserWithEmailAndPassword(email: email, password: password);
 
-      if (userCredential.user != null) {
-        // Success, navigate to business details screen
-        Get.toNamed(Routes.businessDetails);
+      print(
+        "User signed up: ${userCredential.user!.email} : ${userCredential.user!.emailVerified}",
+      );
+
+      if (userCredential.user != null && !userCredential.user!.emailVerified) {
+        print("Sending verification email");
+        // await userCredential.user!.sendEmailVerification();
+        // Get.snackbar(
+        //   "Verification Email Sent",
+        //   "Please check your email to verify your account.",
+        //   snackPosition: SnackPosition.TOP,
+        // );
+        Get.toNamed(Routes.emailOtpVerification); // Navigate to OTP screen
       }
+
+      // if (userCredential.user != null) {
+      //   // Success, navigate to business details screen
+      //   Get.toNamed(Routes.businessDetails);
+      // }
     } on FirebaseAuthException catch (e) {
       String errorMessage = "Signup failed";
       print("Here is the Error --> " + e.code);

@@ -312,9 +312,15 @@ class DashboardScreen extends StatelessWidget {
             return Column(
               children:
                   invoices.isNotEmpty
-                      ? invoices.map((invoice) {
-                        return pendingInvoiceCard(invoice);
-                      }).toList()
+                      ? invoices
+                          .sublist(
+                            0,
+                            invoices.length < 10 ? invoices.length : 10,
+                          )
+                          .map((invoice) {
+                            return pendingInvoiceCard(invoice);
+                          })
+                          .toList()
                       : [
                         Center(
                           child: Padding(
@@ -620,7 +626,6 @@ class DashboardScreen extends StatelessWidget {
                 Text(
                   "${shopData['shop_address']['street']}, ${shopData['shop_address']['zip']}" ??
                       "",
-                  // "Mountain View, California",
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w300,

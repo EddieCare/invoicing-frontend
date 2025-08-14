@@ -60,4 +60,46 @@ class InvoiceListController extends GetxController {
       snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>),
     );
   }
+
+  Future<void> updateInvoiceStatus(String invoiceId, String newStatus) async {
+    try {
+      await _db
+          .collection('vendors')
+          .doc(vendorId)
+          .collection('shops')
+          .doc(shopId)
+          .collection('invoices')
+          .doc(invoiceId)
+          .update({'status': newStatus});
+
+      fetchInvoices(); // Refresh list
+      Get.snackbar("Success", "Invoice marked as $newStatus");
+    } catch (e) {
+      Get.snackbar("Error", "Failed to update invoice: $e");
+    }
+  }
+
+  Future<void> deleteInvoice(String invoiceId) async {
+    try {
+      await _db
+          .collection('vendors')
+          .doc(vendorId)
+          .collection('shops')
+          .doc(shopId)
+          .collection('invoices')
+          .doc(invoiceId)
+          .delete();
+
+      fetchInvoices(); // Refresh list
+      Get.snackbar("Success", "Invoice deleted successfully");
+    } catch (e) {
+      Get.snackbar("Error", "Failed to delete invoice: $e");
+    }
+  }
+
+  @override
+  void onClose() {
+    super.onClose();
+    invoices.clear();
+  }
 }
