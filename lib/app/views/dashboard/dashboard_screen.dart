@@ -123,7 +123,7 @@ class DashboardScreen extends StatelessWidget {
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             Text(
-                              "Financial Overview-s",
+                              "Financial Overview",
                               style: TextStyle(
                                 fontSize: 28,
                                 fontWeight: FontWeight.w500,
