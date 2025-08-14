@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
+import 'invoice_list_controller.dart';
+
 class InvoiceController extends GetxController {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
   final RxList<Map<String, dynamic>> allProducts = <Map<String, dynamic>>[].obs;
@@ -15,7 +17,7 @@ class InvoiceController extends GetxController {
   RxList<Map<String, dynamic>> selectedProducts = <Map<String, dynamic>>[].obs;
   RxList<Map<String, dynamic>> selectedServices = <Map<String, dynamic>>[].obs;
 
-  double TAX_RATE = 0.18; // 18% GST
+  double TAX_RATE = 0.018; // 18% GST
   RxDouble subTotal = 0.0.obs;
   RxBool hasDiscount = false.obs;
   RxDouble discountRate = 0.0.obs;
@@ -94,14 +96,66 @@ class InvoiceController extends GetxController {
               .get();
 
       allProducts.assignAll(
-        productsSnapshot.docs.map((doc) => doc.data()).toList(),
+        productsSnapshot.docs
+            .map((doc) => {...doc.data(), "id": doc.id})
+            .toList(),
       );
       allServices.assignAll(
-        servicesSnapshot.docs.map((doc) => doc.data()).toList(),
+        servicesSnapshot.docs
+            .map((doc) => {...doc.data(), "id": doc.id})
+            .toList(),
       );
     } catch (e) {
       print('Error fetching products/services: $e');
     }
+  }
+
+  void sortProductsByQuery(String query) {
+    allProducts.sort((a, b) {
+      final aName = a['name'].toLowerCase();
+      final bName = b['name'].toLowerCase();
+
+      // If query is empty, just sort alphabetically
+      if (query.isEmpty) {
+        return aName.compareTo(bName);
+      }
+
+      // Prioritize products that contain the query
+      final aContains = aName.contains(query.toLowerCase());
+      final bContains = bName.contains(query.toLowerCase());
+
+      if (aContains && !bContains) return -1; // a first
+      if (!aContains && bContains) return 1; // b first
+
+      // If both contain or both don't contain, fallback to alphabetical
+      return aName.compareTo(bName);
+    });
+
+    allProducts.refresh(); // Important for GetX
+  }
+
+  void sortServicesByQuery(String query) {
+    allServices.sort((a, b) {
+      final aName = a['name'].toLowerCase();
+      final bName = b['name'].toLowerCase();
+
+      // If query is empty, just sort alphabetically
+      if (query.isEmpty) {
+        return aName.compareTo(bName);
+      }
+
+      // Prioritize products that contain the query
+      final aContains = aName.contains(query.toLowerCase());
+      final bContains = bName.contains(query.toLowerCase());
+
+      if (aContains && !bContains) return -1; // a first
+      if (!aContains && bContains) return 1; // b first
+
+      // If both contain or both don't contain, fallback to alphabetical
+      return aName.compareTo(bName);
+    });
+
+    allServices.refresh(); // Important for GetX
   }
 
   void generateInvoiceNumber() {
@@ -133,6 +187,8 @@ class InvoiceController extends GetxController {
   Future<void> addProduct(Map<String, dynamic> product) async {
     final index = selectedProducts.indexWhere((p) => p['id'] == product['id']);
 
+    print("Adding product: ${product['id']}");
+
     if (index >= 0) {
       final current = selectedProducts[index];
       final newQty = (product['quantity'] ?? 1);
@@ -159,6 +215,7 @@ class InvoiceController extends GetxController {
   }
 
   Future<void> removeProduct(Map<String, dynamic> product) async {
+    print("Removing product: ${product['id']}");
     selectedProducts.removeWhere((p) => p['id'] == product['id']);
     updateTotals();
   }
@@ -250,18 +307,45 @@ class InvoiceController extends GetxController {
     tax.value = subtotal * TAX_RATE; // 18% GST
     totalAmt.value = (subtotal - discount) + tax.value;
 
+    if (totalAmt.value < 0) {
+      Get.snackbar("Error", "Total amount cannot be negative");
+      return;
+    }
+
+    var servicesToBeAdded =
+        selectedServices.map((s) {
+          return {
+            'id': s['id'],
+            'name': s['name'],
+            'quantity': s['quantity'] ?? 1,
+            'price': s['price'] ?? 0.0,
+            'total': (s['price'] ?? 0.0) * (s['quantity'] ?? 1),
+          };
+        }).toList();
+
+    var productsToBeAdded =
+        selectedProducts.map((p) {
+          return {
+            'id': p['id'],
+            'name': p['name'],
+            'quantity': p['quantity'] ?? 1,
+            'price': p['price'] ?? 0.0,
+            'total': (p['price'] ?? 0.0) * (p['quantity'] ?? 1),
+          };
+        }).toList();
+
     final invoiceData = {
       "invoice_number": invoiceNumber.value,
       "issue_date": issueDate.value,
       "due_date": dueDate.value,
-      "products": selectedProducts,
-      "services": selectedServices,
+      "products": productsToBeAdded,
+      "services": servicesToBeAdded,
       "client": selectedClient.value,
       "subtotal": subtotal,
       "discount": discount,
       "tax": tax.value,
       "total": totalAmt.value,
-      "status": "Pending",
+      "status": "PENDING",
       "created_at": FieldValue.serverTimestamp(),
     };
 
@@ -273,8 +357,27 @@ class InvoiceController extends GetxController {
         .collection('invoices')
         .add(invoiceData);
 
+    Get.back(); // Close the invoice creation screen
     Get.snackbar("Success", "Invoice Created Successfully");
+    // Refresh the invoice list from invoice list controller
+    Get.find<InvoiceListController>().fetchInvoices();
+    // resetInvoiceData();
   }
+
+  // void resetInvoiceData() {
+  //   invoiceNumber.value = '';
+  //   issueDate.value = DateTime.now();
+  //   dueDate.value = DateTime.now();
+  //   selectedProducts.clear();
+  //   selectedServices.clear();
+  //   subTotal.value = 0.0;
+  //   hasDiscount.value = false;
+  //   discountRate.value = 0.0;
+  //   discountAmt.value = 0.0;
+  //   totalAmt.value = 0.0;
+  //   tax.value = 0.0;
+  //   selectedClient.value = null;
+  // }
 
   final RxList<Map<String, dynamic>> latestPendingOrUnpaid =
       <Map<String, dynamic>>[].obs;

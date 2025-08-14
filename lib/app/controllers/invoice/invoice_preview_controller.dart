@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
@@ -16,6 +17,12 @@ class InvoicePreviewController extends GetxController {
   String formatDate(DateTime? date) {
     if (date == null) return '-';
     return DateFormat('d MMMM, yyyy').format(date);
+  }
+
+  String formatDateFromTimestamp(dynamic timestamp) {
+    if (timestamp == null) return 'N/A';
+    final date = (timestamp as Timestamp).toDate();
+    return DateFormat('MMMM d, yyyy').format(date);
   }
 
   Future<void> sendInvoiceToClient() async {

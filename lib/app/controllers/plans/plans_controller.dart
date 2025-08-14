@@ -1,54 +1,146 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 
 class SubscriptionController extends GetxController {
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   RxInt selectedTab = 0.obs;
   RxInt selectedPlan = 0.obs;
-  RxInt payPeriod = 0.obs;
-
-  RxInt selectedPlanIndex = 1.obs;
+  RxString subscriptionType = "MONTHLY".obs;
   RxBool isYearly = false.obs;
 
-  final plans = [
-    {
-      'name': 'Free',
-      'monthly': '0',
-      'yearly': '0',
-      'features': ['Basic invoices', 'Limited Estimates'],
-    },
-    {
-      'name': 'Plus',
-      'monthly': '4.99',
-      'yearly': '49.99',
-      'features': [
-        '15 Invoices /Month',
-        'Reports',
-        'Add Pictures',
-        'Unlimited Estimates',
-      ],
-    },
-    {
-      'name': 'Premium',
-      'monthly': '9.99',
-      'yearly': '99.99',
-      'features': [
-        'Unlimited Invoices',
-        'Reports',
-        'Pictures',
-        'Unlimited Estimates',
-        'Priority Support',
-      ],
-    },
-  ];
+  RxList<Map<String, dynamic>> plans = <Map<String, dynamic>>[].obs;
+  RxBool isLoading = false.obs;
 
-  void selectTab(int index) {
-    selectedTab.value = index;
+  @override
+  void onInit() {
+    super.onInit();
+    fetchPlans();
   }
 
-  void selectplan(int index) {
-    selectedPlan.value = index;
+  /// Fetch subscription plans securely
+  Future<void> fetchPlans() async {
+    try {
+      isLoading.value = true;
+      final subscriptionDoc =
+          await _firestore.collection('config').doc('subscriptionPlans').get();
+
+      final data = subscriptionDoc.data();
+      if (data != null) {
+        final List<Map<String, dynamic>> loadedPlans = [];
+        final orderedKeys = ['free', 'plus', 'premium'];
+
+        for (final key in orderedKeys) {
+          if (data.containsKey(key)) {
+            final plan = data[key] ?? {};
+            loadedPlans.add({
+              'id': key,
+              'name': plan['name'] ?? key.capitalizeFirst,
+              'monthly': double.tryParse(plan['monthly'].toString()) ?? 0.0,
+              'yearly': double.tryParse(plan['yearly'].toString()) ?? 0.0,
+              'features': List<String>.from(plan['features'] ?? []),
+              'limit': plan['limit'],
+              'isOneTime': plan['isOneTime'] ?? false,
+            });
+          }
+        }
+
+        plans.assignAll(loadedPlans);
+      }
+    } catch (e) {
+      Get.snackbar("Error", "Failed to load plans: $e");
+    } finally {
+      isLoading.value = false;
+    }
   }
 
-  void selectPayPeriod(int index) {
-    payPeriod.value = index;
+  /// Subscribe user securely
+  Future<void> subscribe() async {
+    final user = _auth.currentUser;
+    if (user == null) {
+      Get.snackbar("Error", "You must be logged in to subscribe.");
+      return;
+    }
+
+    final selected = plans[selectedPlan.value];
+    if (selected.isEmpty) {
+      Get.snackbar("Error", "No subscription plan selected.");
+      return;
+    }
+
+    try {
+      isLoading.value = true;
+
+      // 1️⃣ Calculate repayment date
+      final now = DateTime.now();
+      DateTime repayDate =
+          subscriptionType.value == "MONTHLY"
+              ? DateTime(now.year, now.month + 1, now.day)
+              : DateTime(now.year + 1, now.month, now.day);
+
+      // 2️⃣ Call payment gateway (Apple Pay / Google Pay) here
+      // ⚠️ DO NOT mark as subscribed before backend verification
+      final paymentSuccess = await _processPayment(selected);
+      if (!paymentSuccess) {
+        Get.snackbar("Error", "Payment failed or cancelled.");
+        return;
+      }
+
+      // 3️⃣ Verify payment via backend before updating Firestore
+      // Example: send payment token to backend to validate receipt
+      final verified = await _verifyPaymentServerSide();
+      if (!verified) {
+        Get.snackbar("Error", "Payment verification failed.");
+        return;
+      }
+
+      // 4️⃣ Update vendor document with subscription details
+      await _firestore.collection('vendors').doc(user.email).update({
+        'subscription': {
+          'planId': selected['id'],
+          'planName': selected['name'],
+          'repaymentPeriod': subscriptionType.value,
+          'repaymentDate': Timestamp.fromDate(repayDate),
+          'invoicesLimit': selected['limit'],
+          'status': 'active',
+        },
+        'paymentDetails': {
+          'amount':
+              subscriptionType.value == "MONTHLY"
+                  ? selected['monthly']
+                  : selected['yearly'],
+          'currency': 'USD',
+          'method': GetPlatform.isIOS ? 'Apple Pay' : 'Google Pay',
+          'paidAt': FieldValue.serverTimestamp(),
+        },
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      Get.snackbar("Success", "Subscription activated!");
+    } catch (e) {
+      Get.snackbar("Error", "Subscription failed: $e");
+    } finally {
+      isLoading.value = false;
+    }
   }
+
+  /// Dummy payment processor (replace with Apple/Google Pay integration)
+  Future<bool> _processPayment(Map<String, dynamic> plan) async {
+    // TODO: Integrate native payment SDK here
+    await Future.delayed(Duration(seconds: 2));
+    return true; // Simulate success
+  }
+
+  /// Dummy backend verification (replace with API call to validate receipt)
+  Future<bool> _verifyPaymentServerSide() async {
+    // TODO: Make secure HTTPS call to your backend to validate payment receipt
+    await Future.delayed(Duration(seconds: 1));
+    return true; // Simulate verified
+  }
+
+  void selectTab(int index) => selectedTab.value = index;
+
+  void selectPlan(int index) => selectedPlan.value = index;
 }

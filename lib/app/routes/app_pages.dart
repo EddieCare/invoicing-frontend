@@ -3,6 +3,7 @@ import 'package:invoicedaily/app/views/shop/shop_detail.dart';
 
 import '../views/auth/auth_main.dart';
 import '../views/auth/business_detail_screen.dart';
+import '../views/auth/otp_verification.dart';
 import '../views/auth/signup_screen.dart';
 import '../views/base/base_screen.dart';
 import '../views/invoices/create_invoice_screen.dart';
@@ -57,6 +58,12 @@ class AppPages {
     GetPage(
       name: Routes.shopDetailScreen,
       page: () => ShopDetailScreen(shopData: Get.arguments),
+    ),
+
+    // OTP
+    GetPage(
+      name: Routes.emailOtpVerification,
+      page: () => EmailOtpVerificationPage(),
     ),
   ];
 }

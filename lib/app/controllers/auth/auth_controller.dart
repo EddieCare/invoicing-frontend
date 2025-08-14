@@ -18,7 +18,7 @@ class AuthController extends GetxController {
   }
 
   void _handleAuthChanged(User? user) {
-    if (user == null) {
+    if (user == null || !user.emailVerified) {
       Get.offAllNamed(Routes.authMain); // Not logged in
     } else {
       Get.offAllNamed(Routes.baseScreen); // Logged in

@@ -35,6 +35,11 @@ class SplashController extends GetxController {
       return;
     }
 
+    if (!user.emailVerified) {
+      Get.toNamed(Routes.emailOtpVerification);
+      return;
+    }
+
     final uid = user.uid;
     final email = user.email;
 

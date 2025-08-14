@@ -20,7 +20,10 @@ class InvoiceDetailsController extends GetxController {
   double get totalAmount => invoice['total'] ?? 0.0;
 
   List<Map<String, dynamic>> get services =>
-      List<Map<String, dynamic>>.from(invoice['items'] ?? []);
+      List<Map<String, dynamic>>.from(invoice['services'] ?? []);
+
+  List<Map<String, dynamic>> get products =>
+      List<Map<String, dynamic>>.from(invoice['products'] ?? []);
 
   String _formatDate(dynamic timestamp) {
     if (timestamp == null) return 'N/A';

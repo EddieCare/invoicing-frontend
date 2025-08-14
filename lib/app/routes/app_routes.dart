@@ -27,4 +27,7 @@ abstract class Routes {
 
   // Product
   static const shopDetailScreen = '/shopDetailScreen';
+
+  // OTP
+  static const String emailOtpVerification = '/emailOtpVerification';
 }
