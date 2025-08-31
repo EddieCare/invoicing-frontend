@@ -14,7 +14,7 @@ class IAPService {
   // Configure these product IDs in App Store Connect and Google Play Console
   // and keep them consistent across stores where possible.
   // Example identifiers (replace with your real IDs):
-  static const String plusMonthly = 'plus_monthly';
+  static const String plusMonthly = 'plus_monthlyx';
   static const String plusYearly = 'plus_yearly';
   static const String premiumMonthly = 'premium_monthly';
   static const String premiumYearly = 'premium_yearly';

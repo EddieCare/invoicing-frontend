@@ -138,7 +138,7 @@ class SubscriptionController extends GetxController {
     final bool isMonthly = subscriptionType.value == 'MONTHLY';
     late final String productId;
     if (planId == 'PLUS') {
-      productId = isMonthly ? 'plus_monthly' : 'plus_yearly';
+      productId = isMonthly ? 'plus_monthlyx' : 'plus_yearly';
     } else if (planId == 'PREMIUM') {
       productId = isMonthly ? 'premium_monthly' : 'premium_yearly';
     } else {
