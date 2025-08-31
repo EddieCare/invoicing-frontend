@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../routes/app_routes.dart';
+import 'package:invoicedaily/services/subscription_service.dart';
 
 class ProductController extends GetxController {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -122,6 +123,24 @@ class ProductController extends GetxController {
     }
 
     try {
+      // Enforce plan limits for product/service count
+      final planService = PlanService();
+      final canAdd = isService
+          ? await planService.canAddServiceForShop(vendorId: email!, shopId: shopId)
+          : await planService.canAddProductForShop(vendorId: email!, shopId: shopId);
+
+      if (canAdd != true) {
+        Get.snackbar(
+          "Plan Limit Reached",
+          isService
+              ? "You have reached your services limit. Please upgrade your plan."
+              : "You have reached your products limit. Please upgrade your plan.",
+          snackPosition: SnackPosition.TOP,
+        );
+        isLoading.value = false;
+        return;
+      }
+
       await _firestore
           .collection('vendors')
           .doc(email)

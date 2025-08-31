@@ -130,7 +130,7 @@ class SubscriptionPage extends StatelessWidget {
             features: List<String>.from(plan['features'] as List<dynamic>),
           ),
           const SizedBox(height: 20),
-          _SubscribeButton(),
+          _SubscribeButton(controller: controller),
         ],
       ),
     );
@@ -250,22 +250,29 @@ class _FeaturesBox extends StatelessWidget {
 }
 
 class _SubscribeButton extends StatelessWidget {
+  final SubscriptionController controller;
+
+  const _SubscribeButton({required this.controller});
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          decoration: BoxDecoration(
-            color: Colors.black,
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: const Center(
-            child: Text(
-              'Subscribe',
-              style: TextStyle(color: Colors.white, fontSize: 16),
+        ElevatedButton(
+          onPressed: () async {
+            // TODO: Handle button press
+            await controller.subscribe();
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Colors.black,
+            minimumSize: const Size(double.infinity, 56),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
+          ),
+          child: const Text(
+            'Subscribe',
+            style: TextStyle(color: Colors.white, fontSize: 16),
           ),
         ),
         const SizedBox(height: 12),

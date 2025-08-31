@@ -23,40 +23,34 @@ class AuthMainScreen extends StatelessWidget {
             constraints: BoxConstraints(minHeight: constraints.maxHeight),
             child: IntrinsicHeight(
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   // Scrollable Content (Top + Middle)
-                  Expanded(
-                    child: SingleChildScrollView(
-                      physics: const ClampingScrollPhysics(),
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 130),
-                          Image.asset(
-                            "assets/images/logo.png",
-                            width: 100,
-                            height: 100,
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            "Invoice Daily",
-                            style: TextStyle(
-                              fontSize: 26 * textScale,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            "Create professional invoices in \nseconds",
-                            textAlign: TextAlign.center,
-                            style: TextStyle(fontSize: 18 * textScale),
-                          ),
-                          const SizedBox(height: 20),
-                          // Image.asset("assets/images/arc1.png", width: 100),
-                        ],
+                  const SizedBox(height: 50),
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 0),
+                      Image.asset(
+                        "assets/images/logo.png",
+                        width: 100,
+                        height: 100,
                       ),
-                    ),
+                      // const SizedBox(height: 0),
+                      Text(
+                        "Invoice Daily",
+                        style: TextStyle(
+                          fontSize: 26 * textScale,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 5),
+                      Text(
+                        "Create professional invoices in \nseconds",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 18 * textScale),
+                      ),
+                    ],
                   ),
 
                   Lottie.asset(
@@ -106,8 +100,6 @@ class AuthMainScreen extends StatelessWidget {
                             ),
                           ),
                         ),
-                        // const SizedBox(height: 20),
-                        // Text("---------------- Or ----------------"),
                         const SizedBox(height: 20),
                         SizedBox(
                           width: double.infinity,
@@ -146,58 +138,57 @@ class AuthMainScreen extends StatelessWidget {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 30),
-                        RichText(
-                          textAlign: TextAlign.center,
-                          text: TextSpan(
-                            style: TextStyle(
-                              fontSize: 14 * textScale,
-                              color: Colors.black,
-                            ),
-                            children: [
-                              const TextSpan(
-                                text: "By continuing you are agreeing to our\n",
-                                style: TextStyle(height: 4),
-                              ),
-                              TextSpan(
-                                text: "Term's of Use",
-                                style: const TextStyle(
-                                  decoration: TextDecoration.underline,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.blue,
-                                ),
-                                recognizer:
-                                    TapGestureRecognizer()
-                                      ..onTap = () {
-                                        // Dummy link
-                                        launchDummyLink(
-                                          "https://example.com/terms",
-                                        );
-                                      },
-                              ),
-                              const TextSpan(text: " & "),
-                              TextSpan(
-                                text: "Privacy Policy",
-                                style: const TextStyle(
-                                  decoration: TextDecoration.underline,
-                                  fontWeight: FontWeight.w700,
-                                  color: Colors.blue,
-                                ),
-                                recognizer:
-                                    TapGestureRecognizer()
-                                      ..onTap = () {
-                                        // Dummy link
-                                        launchDummyLink(
-                                          "https://example.com/privacy",
-                                        );
-                                      },
-                              ),
-                            ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 30),
+                  RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                      style: TextStyle(
+                        fontSize: 14 * textScale,
+                        color: Colors.black,
+                      ),
+                      children: [
+                        const TextSpan(
+                          text: "By continuing you are agreeing to our\n",
+                          style: TextStyle(height: 4),
+                        ),
+                        TextSpan(
+                          text: "Term's of Use",
+                          style: const TextStyle(
+                            decoration: TextDecoration.underline,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.blue,
                           ),
+                          recognizer:
+                              TapGestureRecognizer()
+                                ..onTap = () {
+                                  // Dummy link
+                                  launchDummyLink("https://example.com/terms");
+                                },
+                        ),
+                        const TextSpan(text: " & "),
+                        TextSpan(
+                          text: "Privacy Policy",
+                          style: const TextStyle(
+                            decoration: TextDecoration.underline,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.blue,
+                          ),
+                          recognizer:
+                              TapGestureRecognizer()
+                                ..onTap = () {
+                                  // Dummy link
+                                  launchDummyLink(
+                                    "https://example.com/privacy",
+                                  );
+                                },
                         ),
                       ],
                     ),
                   ),
+                  const SizedBox(height: 30),
                 ],
               ),
             ),

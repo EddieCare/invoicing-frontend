@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
+import 'package:invoicedaily/services/iap_service.dart';
 
 class SubscriptionController extends GetxController {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -36,12 +37,12 @@ class SubscriptionController extends GetxController {
           if (data.containsKey(key)) {
             final plan = data[key] ?? {};
             loadedPlans.add({
-              'id': key,
+              'id': plan['id'] ?? "FREE",
               'name': plan['name'] ?? key.capitalizeFirst,
               'monthly': double.tryParse(plan['monthly'].toString()) ?? 0.0,
               'yearly': double.tryParse(plan['yearly'].toString()) ?? 0.0,
               'features': List<String>.from(plan['features'] ?? []),
-              'limit': plan['limit'],
+              'limits': plan['limits'],
               'isOneTime': plan['isOneTime'] ?? false,
             });
           }
@@ -80,7 +81,7 @@ class SubscriptionController extends GetxController {
               ? DateTime(now.year, now.month + 1, now.day)
               : DateTime(now.year + 1, now.month, now.day);
 
-      // 2️⃣ Call payment gateway (Apple Pay / Google Pay) here
+      // 2️⃣ Call in-app purchase flow (Play Billing / StoreKit)
       // ⚠️ DO NOT mark as subscribed before backend verification
       final paymentSuccess = await _processPayment(selected);
       if (!paymentSuccess) {
@@ -103,7 +104,7 @@ class SubscriptionController extends GetxController {
           'planName': selected['name'],
           'repaymentPeriod': subscriptionType.value,
           'repaymentDate': Timestamp.fromDate(repayDate),
-          'invoicesLimit': selected['limit'],
+          'invoicesLimit': (selected['limits'] ?? const {})['invoices'],
           'status': 'active',
         },
         'paymentDetails': {
@@ -112,7 +113,7 @@ class SubscriptionController extends GetxController {
                   ? selected['monthly']
                   : selected['yearly'],
           'currency': 'USD',
-          'method': GetPlatform.isIOS ? 'Apple Pay' : 'Google Pay',
+          'method': GetPlatform.isIOS ? 'App Store' : 'Play Billing',
           'paidAt': FieldValue.serverTimestamp(),
         },
         'updatedAt': FieldValue.serverTimestamp(),
@@ -126,11 +127,29 @@ class SubscriptionController extends GetxController {
     }
   }
 
-  /// Dummy payment processor (replace with Apple/Google Pay integration)
+  /// In-app purchase using `in_app_purchase` (StoreKit / Play Billing)
   Future<bool> _processPayment(Map<String, dynamic> plan) async {
-    // TODO: Integrate native payment SDK here
-    await Future.delayed(Duration(seconds: 2));
-    return true; // Simulate success
+    final planId = (plan['id'] ?? '').toString().toUpperCase();
+    if (planId == 'FREE') {
+      return true; // No charge for free plan
+    }
+
+    // Map plan + period -> product identifiers configured in stores
+    final bool isMonthly = subscriptionType.value == 'MONTHLY';
+    late final String productId;
+    if (planId == 'PLUS') {
+      productId = isMonthly ? 'plus_monthly' : 'plus_yearly';
+    } else if (planId == 'PREMIUM') {
+      productId = isMonthly ? 'premium_monthly' : 'premium_yearly';
+    } else {
+      return false;
+    }
+
+    print(
+      "Purchasing product: $productId, monthly: $isMonthly, planId: $planId",
+    );
+
+    return await IAPService.instance.purchase(productId);
   }
 
   /// Dummy backend verification (replace with API call to validate receipt)

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import 'package:invoicedaily/services/subscription_service.dart';
 
 import 'invoice_list_controller.dart';
 
@@ -31,6 +32,8 @@ class InvoiceController extends GetxController {
 
   String vendorId = ''; // Set this from the calling screen or auth
   String shopId = ''; // Set this from the calling screen
+
+  PlanService planService = PlanService();
 
   @override
   void onInit() {
@@ -289,6 +292,22 @@ class InvoiceController extends GetxController {
   Future<void> createInvoice() async {
     if (selectedClient.value == null) {
       Get.snackbar("Error", "Client not selected");
+      return;
+    }
+
+    // Enforce plan limit BEFORE creating the invoice
+    final allowed = await planService
+        .canCreateInvoiceForShop(vendorId: vendorId, shopId: shopId)
+        .catchError((error) {
+      Get.snackbar("Error", "Failed to check plan limit: $error");
+      return false;
+    });
+
+    if (allowed != true) {
+      Get.snackbar(
+        "Plan Limit Reached",
+        "You have reached your invoice creation limit. Please upgrade your plan.",
+      );
       return;
     }
 
