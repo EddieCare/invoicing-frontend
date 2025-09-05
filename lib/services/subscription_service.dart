@@ -109,9 +109,17 @@ class PlanService {
         .doc(shopId)
         .collection('invoices');
 
-    final countSnap = await ref.count().get();
-    final current = countSnap.count;
-    return current! < invLimit;
+    // Count only invoices in the current month
+    final now = DateTime.now();
+    final from = DateTime(now.year, now.month, 1);
+    final to = DateTime(now.year, now.month + 1, 1);
+
+    final snap = await ref
+        .where('issue_date', isGreaterThanOrEqualTo: Timestamp.fromDate(from))
+        .where('issue_date', isLessThan: Timestamp.fromDate(to))
+        .get();
+    final current = snap.size;
+    return current < invLimit;
   }
 
   Future<bool> canAddProductForShop({
@@ -162,20 +170,34 @@ class PlanService {
       };
     }
 
-    if (await canCreateInvoiceForShop(vendorId: vendorId, shopId: shopId)) {
+    // Monthly remaining for invoices (if shopId provided)
+    if (shopId != null) {
+      final invLimit = sub.limits.invoices;
+      if (invLimit == null) {
+        return {'allowed': true, 'remaining': double.infinity};
+      }
       final ref = _firestore
           .collection('vendors')
           .doc(vendorId)
           .collection('shops')
           .doc(shopId)
           .collection('invoices');
-      final countSnap = await ref.count().get();
-      final current = countSnap.count;
-      final limit = sub.limits.invoices;
-      final remaining =
-          limit == null ? double.infinity : (limit - current!).clamp(0, limit);
-      return {'allowed': true, 'remaining': remaining};
+
+      final now = DateTime.now();
+      final from = DateTime(now.year, now.month, 1);
+      final to = DateTime(now.year, now.month + 1, 1);
+
+      final snap = await ref
+          .where('issue_date', isGreaterThanOrEqualTo: Timestamp.fromDate(from))
+          .where('issue_date', isLessThan: Timestamp.fromDate(to))
+          .get();
+      final used = snap.size;
+      final remaining = (invLimit - used).clamp(0, invLimit);
+      return {'allowed': used < invLimit, 'remaining': remaining};
     }
-    return {'allowed': false, 'remaining': 0};
+    return {
+      'allowed': sub.limits.invoices == null || sub.limits.invoices! > 0,
+      'remaining': sub.limits.invoices ?? double.infinity,
+    };
   }
 }

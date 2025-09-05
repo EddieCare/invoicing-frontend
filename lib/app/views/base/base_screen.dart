@@ -5,6 +5,7 @@ import '../../../components/bottom_navbar.dart';
 import '../../../components/sidebar_menu.dart';
 import '../../controllers/base/base_controller.dart';
 import '../dashboard/dashboard_screen.dart';
+import '../analytics/analytics_screen.dart';
 import '../invoices/invoice_screen.dart';
 import '../product/product_screen.dart';
 import '../profile/profile_screen.dart';
@@ -16,6 +17,7 @@ class BaseScreen extends StatelessWidget {
 
   final List<Widget> pages = [
     DashboardScreen(),
+    AnalyticsScreen(),
     InvoiceScreen(),
     ProductScreen(),
     ProfileScreen(),

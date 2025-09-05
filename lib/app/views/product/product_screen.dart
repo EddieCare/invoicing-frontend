@@ -29,7 +29,33 @@ class ProductScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // urgentNotificationsCard(),
+              if (controller.showUpgradeBanner.value)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.yellow.shade50,
+                    border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.warning_amber_rounded, color: Colors.orange),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          controller.bannerText.value,
+                          style: const TextStyle(fontWeight: FontWeight.w600),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () => controller.showUpgradeBanner.value = false,
+                        child: const Icon(Icons.close, size: 18),
+                      ),
+                    ],
+                  ),
+                ),
               const SizedBox(height: 20),
               _filterBar(controller),
               const SizedBox(height: 20),

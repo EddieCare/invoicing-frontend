@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 
 import '../../../components/dashed_rect.dart';
+import '../../../components/buttons.dart';
 import '../../../components/top_bar.dart';
 import '../../../values/values.dart';
 import '../../controllers/invoice/invoice_controller.dart';
@@ -76,13 +77,21 @@ class CreateInvoiceScreen extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  _actionButton(
-                    "Save",
-                    black: true,
-                    onTap: () => controller.createInvoice(),
+                  SizedBox(
+                    width: 140,
+                    child: AsyncButton(
+                      text: 'Save',
+                      onPressedAsync: () => controller.createInvoice(),
+                    ),
                   ),
                   const SizedBox(width: 10),
-                  _actionButton("Discard", black: true),
+                  SizedBox(
+                    width: 140,
+                    child: SecondaryButton(
+                      text: 'Discard',
+                      onPressed: () {},
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 40),

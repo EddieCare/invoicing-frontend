@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../../../components/top_bar.dart';
 import '../../controllers/plans/plans_controller.dart';
 import '../../routes/app_routes.dart';
+import '../../../components/buttons.dart';
 
 class SubscriptionPage extends StatelessWidget {
   SubscriptionPage({super.key});
@@ -258,21 +259,11 @@ class _SubscribeButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        ElevatedButton(
-          onPressed: () async {
-            // TODO: Handle button press
-            await controller.subscribe();
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.black,
-            minimumSize: const Size(double.infinity, 56),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-          child: const Text(
-            'Subscribe',
-            style: TextStyle(color: Colors.white, fontSize: 16),
+        SizedBox(
+          width: double.infinity,
+          child: AsyncButton(
+            text: 'Subscribe',
+            onPressedAsync: () => controller.subscribe(),
           ),
         ),
         const SizedBox(height: 12),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../components/buttons.dart';
 import '../../../components/top_bar.dart';
 import '../../../values/values.dart';
 import '../../controllers/invoice/invoice_preview_controller.dart';
@@ -20,6 +21,27 @@ class InvoicePreviewScreen extends StatelessWidget {
         title: "Invoice Preview",
         showBackButton: true,
         showAddInvoice: false,
+        actions: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              TextButton.icon(
+                onPressed: () => controller.downloadPdf(),
+                icon: const Icon(Icons.download, size: 22, color: Colors.black),
+                label: const Text(
+                  'Save',
+                  style: TextStyle(fontSize: 14, color: Colors.black),
+                ),
+              ),
+              IconButton(
+                tooltip: 'Share PDF',
+                icon: const Icon(Icons.ios_share, size: 22),
+                onPressed: () => controller.sharePdf(),
+              ),
+            ],
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.only(top: 20),
@@ -308,49 +330,30 @@ class InvoicePreviewScreen extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _button(
-          context,
-          "Download PDF",
-          Icons.print,
-          Colors.blue,
-          onPressed: () async {
-            await controller.downloadPdf();
-          },
-        ),
-        _button(
-          context,
-          "Send",
-          Icons.send,
-          Colors.green,
+        // _asyncButton(
+        //   label: 'Download PDF',
+        //   onPressed: () => controller.downloadPdf(),
+        // ),
+        _asyncButton(
+          label: 'Send',
           onPressed: () async {
             await controller.sendInvoiceToClient();
             ScaffoldMessenger.of(
               context,
-            ).showSnackBar(const SnackBar(content: Text("Invoice sent!")));
+            ).showSnackBar(const SnackBar(content: Text('Invoice sent!')));
           },
         ),
       ],
     );
   }
 
-  Widget _button(
-    BuildContext context,
-    String label,
-    IconData icon,
-    Color color, {
-    VoidCallback? onPressed,
+  Widget _asyncButton({
+    required String label,
+    required Future<void> Function() onPressed,
   }) {
-    return ElevatedButton.icon(
-      onPressed: onPressed ?? () {},
-      icon: Icon(icon, size: 20),
-      label: Text(label),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.black,
-        foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        elevation: 3,
-      ),
+    return SizedBox(
+      width: 140,
+      child: AsyncButton(text: label, onPressedAsync: onPressed, primary: true),
     );
   }
 }

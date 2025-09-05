@@ -1,9 +1,17 @@
 import 'package:flutter/material.dart';
 
-Widget urgentNotificationsCard() {
+Widget urgentNotificationsCard({required double growthRate}) {
+  final isUp = growthRate > 0;
+  final color = isUp ? Colors.green : Colors.redAccent;
+  final title = isUp
+      ? "Congratulations, Your business is growing!"
+      : "Heads up, revenue declined";
+  final subtitle = isUp
+      ? "Your revenue increased by ${growthRate.toStringAsFixed(1)}% since last month"
+      : "Your revenue decreased by ${growthRate.abs().toStringAsFixed(1)}% since last month";
+
   return Container(
     padding: const EdgeInsets.all(16),
-    // margin: const EdgeInsets.symmetric(horizontal: 15),
     decoration: BoxDecoration(
       color: Colors.white,
       borderRadius: BorderRadius.circular(16),
@@ -11,38 +19,38 @@ Widget urgentNotificationsCard() {
         BoxShadow(
           color: Colors.grey.shade100,
           blurRadius: 6,
-          offset: Offset(0, 2),
+          offset: const Offset(0, 2),
         ),
       ],
     ),
     child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(Icons.trending_up, color: Colors.green, size: 40),
+        Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.12),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(
+            isUp ? Icons.trending_up : Icons.trending_down,
+            color: color,
+            size: 20,
+          ),
+        ),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
+            children: [
               Text(
-                "Congratulations, Your Business is growing !!!",
-                style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+                title,
+                style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
               ),
-              SizedBox(height: 4),
-              Text.rich(
-                TextSpan(
-                  text: "Your revenue increase is ",
-                  style: TextStyle(fontSize: 13),
-                  children: [
-                    TextSpan(
-                      text: "6%",
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.green,
-                      ),
-                    ),
-                    TextSpan(text: " since last month"),
-                  ],
-                ),
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                style: const TextStyle(fontSize: 13),
               ),
             ],
           ),

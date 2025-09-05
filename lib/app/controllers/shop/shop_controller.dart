@@ -53,6 +53,7 @@ class ShopController extends GetxController {
     if (email == null) return;
 
     try {
+      isLoading.value = true;
       final shopRef = _firestore
           .collection('vendors')
           .doc(email)
@@ -83,6 +84,8 @@ class ShopController extends GetxController {
       Get.snackbar("Success", "Shop created successfully");
     } catch (e) {
       Get.snackbar("Error", "Failed to create shop: $e");
+    } finally {
+      isLoading.value = false;
     }
   }
 

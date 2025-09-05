@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../components/buttons.dart';
 import '../../../components/dialogs.dart';
 import '../../../components/input_fld.dart';
 import '../../../components/top_bar.dart';
@@ -121,23 +122,18 @@ class AddProductScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               const SizedBox(width: 12),
-              productController.isLoading.value
-                  ? SizedBox(
-                    width: 40,
-                    height: 40,
-                    child: CircularProgressIndicator(
-                      color: AppColor.textColorPrimary,
-                      strokeWidth: 4,
-                    ),
-                  )
-                  : _buildButton(
-                    isService ? "Add Service" : "Add Product",
-                    onTap: () {
-                      if (!productController.isLoading.value) {
-                        productController.submitForm(isService: isService);
-                      }
-                    },
-                  ),
+              Expanded(
+                child: PrimaryButton(
+                  text: isService ? "Add Service" : "Add Product",
+                  isLoading: productController.isLoading.value,
+                  onPressed: () {
+                    final form = productController.formKey.currentState;
+                    if (form?.validate() == true) {
+                      productController.submitForm(isService: isService);
+                    }
+                  },
+                ),
+              ),
             ],
           ),
         ),
@@ -232,24 +228,5 @@ class AddProductScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildButton(
-    String label, {
-    required VoidCallback onTap,
-    bool isPrimary = true,
-  }) {
-    return Expanded(
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: isPrimary ? Colors.black : Colors.grey.shade300,
-          foregroundColor: isPrimary ? Colors.white : Colors.black,
-          padding: const EdgeInsets.symmetric(vertical: 14),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        onPressed: onTap,
-        child: Text(label),
-      ),
-    );
-  }
+  // Removed local button in favor of PrimaryButton
 }

@@ -299,9 +299,9 @@ class InvoiceController extends GetxController {
     final allowed = await planService
         .canCreateInvoiceForShop(vendorId: vendorId, shopId: shopId)
         .catchError((error) {
-      Get.snackbar("Error", "Failed to check plan limit: $error");
-      return false;
-    });
+          Get.snackbar("Error", "Failed to check plan limit: $error");
+          return false;
+        });
 
     if (allowed != true) {
       Get.snackbar(
@@ -424,7 +424,7 @@ class InvoiceController extends GetxController {
             .collection('shops')
             .doc(shopId)
             .collection('invoices')
-            .where('status', whereIn: ['Pending', 'Unpaid'])
+            .where('status', whereIn: ['PENDING'])
             .orderBy('issue_date', descending: true)
             .limit(5)
             .get();

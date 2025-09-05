@@ -12,6 +12,8 @@ class ProductController extends GetxController {
   final RxBool isLoading = false.obs;
 
   RxList<Map<String, dynamic>> items = <Map<String, dynamic>>[].obs;
+  RxBool showUpgradeBanner = false.obs;
+  RxString bannerText = ''.obs;
 
   // Form Controllers
   final formKey = GlobalKey<FormState>();
@@ -257,12 +259,42 @@ class ProductController extends GetxController {
   void updateFilter(String filter) {
     selectedFilter.value = filter;
     fetchItems();
+    computePlanCaps();
   }
 
   @override
   void onInit() {
     fetchItems();
+    computePlanCaps();
     // fetchCategories();
     super.onInit();
+  }
+
+  Future<void> computePlanCaps() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+    final email = user.email;
+    final shopSnapshot = await _firestore
+        .collection('vendors')
+        .doc(email)
+        .collection('shops')
+        .limit(1)
+        .get();
+    if (shopSnapshot.docs.isEmpty) return;
+    final shopId = shopSnapshot.docs.first.id;
+
+    final planService = PlanService();
+    final canAddProduct = await planService.canAddProductForShop(vendorId: email!, shopId: shopId);
+    final canAddService = await planService.canAddServiceForShop(vendorId: email, shopId: shopId);
+
+    if (!canAddProduct || !canAddService) {
+      showUpgradeBanner.value = true;
+      bannerText.value = !canAddProduct
+          ? 'You have reached your product limit. Consider upgrading your plan.'
+          : 'You have reached your service limit. Consider upgrading your plan.';
+    } else {
+      showUpgradeBanner.value = false;
+      bannerText.value = '';
+    }
   }
 }

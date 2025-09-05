@@ -100,7 +100,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../components/Buttons.dart';
-import '../../../components/custom_text_field.dart';
+import '../../../components/input_fld.dart';
 import '../../../values/values.dart';
 import '../../controllers/auth/signup_controller.dart';
 import '../../routes/app_routes.dart';
@@ -113,6 +113,7 @@ class SignupScreen extends StatelessWidget {
     final mediaQuery = MediaQuery.of(context);
     final screenWidth = mediaQuery.size.width;
     final textScale = mediaQuery.textScaleFactor;
+    final formKey = GlobalKey<FormState>();
 
     return Scaffold(
       backgroundColor: AppColor.pageColor,
@@ -153,26 +154,41 @@ class SignupScreen extends StatelessWidget {
                       const SizedBox(height: 20),
                       // Image.asset("assets/images/arc1.png", width: 100),
                       const SizedBox(height: 40),
-                      CustomTextField(
-                        label: "Email*",
-                        controller: controller.emailController,
-                      ),
-                      CustomTextField(
-                        label: "Password*",
-                        controller: controller.passwordController,
-                        isPassword: true,
+                      Form(
+                        key: formKey,
+                        child: Column(
+                          children: [
+                            buildInputField(
+                              controller.emailController,
+                              "Email",
+                              isRequired: true,
+                              keyboardType: TextInputType.emailAddress,
+                            ),
+                            buildInputField(
+                              controller.passwordController,
+                              "Password",
+                              isRequired: true,
+                              obscureText: true,
+                            ),
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 30),
 
                       const Spacer(),
 
                       // Loading or Continue Button
-                      controller.isLoading.value
+                      Obx(() => controller.isLoading.value
                           ? const CircularProgressIndicator()
                           : PrimaryButton(
-                            text: "Continue",
-                            onPressed: controller.signupWithEmail,
-                          ),
+                              text: "Continue",
+                              isLoading: controller.isLoading.value,
+                              onPressed: () {
+                                if (formKey.currentState?.validate() == true) {
+                                  controller.signupWithEmail();
+                                }
+                              },
+                            )),
                       const SizedBox(height: 20),
                       TextButton(
                         onPressed: () => Get.toNamed(Routes.login),

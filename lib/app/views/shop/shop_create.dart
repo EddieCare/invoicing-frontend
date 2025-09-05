@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../../components/buttons.dart';
 import '../../../components/input_fld.dart';
 import '../../../values/values.dart';
 import '../../controllers/shop/shop_controller.dart';
@@ -17,6 +18,7 @@ void showCreateShopBottomSheet(BuildContext context) {
   final TextEditingController addressController = TextEditingController();
 
   final controller = Get.find<ShopController>();
+  final formKey = GlobalKey<FormState>();
 
   showModalBottomSheet(
     context: context,
@@ -34,104 +36,89 @@ void showCreateShopBottomSheet(BuildContext context) {
           top: 15,
         ),
         child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Center(
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.3,
-                  height: 6,
-                  decoration: BoxDecoration(
-                    color: AppColor.textColorPrimary.withAlpha(80),
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                ),
-              ),
-              SizedBox(height: 20),
-              Center(
-                child: Text(
-                  "Create Shop",
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-                ),
-              ),
-              // Divider(thickness: 1),
-              SizedBox(height: 50),
-              buildInputField(nameController, "Shop Name"),
-              buildInputField(shopImageUrl, "Shop Photo Link"),
-              // _buildInput(gstController, "GST Number"),
-              buildInputField(taxController, "Tax Number"),
-              buildInputField(typeController, "Shop Type"),
-              buildInputField(categoryController, "Shop Category"),
-              buildInputField(
-                emailController,
-                "Shop Email",
-                keyboardType: TextInputType.emailAddress,
-              ),
-              buildInputField(
-                phoneController,
-                "Shop Phone",
-                keyboardType: TextInputType.phone,
-              ),
-              buildInputField(
-                addressController,
-                "Shop Address (Street, City, State, Zip, Country)",
-                maxLines: 2,
-              ),
-              SizedBox(height: 24),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // final controller = Get.find<ShopController>();
-                    final data = {
-                      "shop_name": nameController.text.trim(),
-                      "shop_image_link": shopImageUrl.text.trim(),
-                      // "gst_number": gstController.text.trim(),
-                      "tax_number": taxController.text.trim(),
-                      "shop_type": typeController.text.trim(),
-                      "shop_category": categoryController.text.trim(),
-                      "shop_email": emailController.text.trim(),
-                      "shop_phone": phoneController.text.trim(),
-                      "shop_address": {
-                        "street": addressController.text.trim(),
-                        "city": "",
-                        "state": "",
-                        "zip": "",
-                        "country": "",
-                      },
-                    };
-                    if (!controller.isLoading.value)
-                      controller.createShop(data);
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        controller.isLoading.value
-                            ? AppColor.pageColor
-                            : Colors.black,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+          child: Form(
+            key: formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: MediaQuery.of(context).size.width * 0.3,
+                    height: 6,
+                    decoration: BoxDecoration(
+                      color: AppColor.textColorPrimary.withAlpha(80),
+                      borderRadius: BorderRadius.circular(50),
                     ),
-                    padding: EdgeInsets.symmetric(vertical: 16),
                   ),
-                  child:
-                      controller.isLoading.value
-                          ? Center(
-                            child: CircularProgressIndicator(
-                              color: AppColor.textColorPrimary,
-                            ),
-                          )
-                          : Text(
-                            "Create Shop",
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
-                          ),
                 ),
-              ),
-              SizedBox(height: 20),
-            ],
+                SizedBox(height: 20),
+                Center(
+                  child: Text(
+                    "Create Shop",
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                // Divider(thickness: 1),
+                SizedBox(height: 50),
+                buildInputField(nameController, "Shop Name", isRequired: true),
+                buildInputField(shopImageUrl, "Shop Photo Link"),
+                // _buildInput(gstController, "GST Number"),
+                buildInputField(taxController, "Tax Number"),
+                buildInputField(typeController, "Shop Type", isRequired: true),
+                buildInputField(
+                  categoryController,
+                  "Shop Category",
+                  isRequired: true,
+                ),
+                buildInputField(
+                  emailController,
+                  "Shop Email",
+                  keyboardType: TextInputType.emailAddress,
+                ),
+                buildInputField(
+                  phoneController,
+                  "Shop Phone",
+                  keyboardType: TextInputType.phone,
+                ),
+                buildInputField(
+                  addressController,
+                  "Shop Address (Street, City, State, Zip, Country)",
+                  maxLines: 2,
+                ),
+                SizedBox(height: 24),
+                Obx(
+                  () => SizedBox(
+                    width: double.infinity,
+                    child: PrimaryButton(
+                      text: "Create Shop",
+                      isLoading: controller.isLoading.value,
+                      onPressed: () {
+                        if (formKey.currentState?.validate() != true) return;
+                        final data = {
+                          "shop_name": nameController.text.trim(),
+                          "shop_image_link": shopImageUrl.text.trim(),
+                          // "gst_number": gstController.text.trim(),
+                          "tax_number": taxController.text.trim(),
+                          "shop_type": typeController.text.trim(),
+                          "shop_category": categoryController.text.trim(),
+                          "shop_email": emailController.text.trim(),
+                          "shop_phone": phoneController.text.trim(),
+                          "shop_address": {
+                            "street": addressController.text.trim(),
+                            "city": "",
+                            "state": "",
+                            "zip": "",
+                            "country": "",
+                          },
+                        };
+                        controller.createShop(data);
+                      },
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20),
+              ],
+            ),
           ),
         ),
       );

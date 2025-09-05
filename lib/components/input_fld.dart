@@ -51,14 +51,16 @@ Widget buildInputField(
   bool isNumber = false,
   int maxLines = 1,
   TextInputType keyboardType = TextInputType.text,
+  bool obscureText = false,
   String? Function(String?)? customValidator,
 }) {
   return Padding(
     padding: const EdgeInsets.only(bottom: 20),
     child: TextFormField(
       controller: controller,
-      keyboardType: isNumber ? TextInputType.number : TextInputType.text,
+      keyboardType: isNumber ? TextInputType.number : keyboardType,
       maxLines: maxLines,
+      obscureText: obscureText,
       cursorColor: Colors.black,
       style: const TextStyle(color: Colors.black),
       decoration: InputDecoration(

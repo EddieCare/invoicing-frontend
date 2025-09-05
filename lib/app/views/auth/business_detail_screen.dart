@@ -113,13 +113,14 @@ import 'package:invoicedaily/app/routes/app_routes.dart';
 import '../../../components/Buttons.dart';
 import '../../../values/values.dart';
 import '../../controllers/auth/vendor_detail_controller.dart';
-import '../../../components/custom_text_field.dart';
+import '../../../components/input_fld.dart';
 
 class BusinessDetailScreen extends StatelessWidget {
   final VendorDetailsController controller = Get.put(VendorDetailsController());
 
   @override
   Widget build(BuildContext context) {
+    final formKey = GlobalKey<FormState>();
     return Scaffold(
       backgroundColor: AppColor.pageColor,
       body: SafeArea(
@@ -129,60 +130,82 @@ class BusinessDetailScreen extends StatelessWidget {
             children: [
               infoSection(context),
               const SizedBox(height: 20),
-              CustomTextField(
-                label: "Full Name*",
-                controller: controller.fullNameController,
-              ),
-              CustomTextField(
-                label: "Business Name*",
-                controller: controller.nameController,
-              ),
-              CustomTextField(
-                label: "Email*",
-                controller: controller.emailController,
-              ),
-              CustomTextField(
-                label: "Phone Number*",
-                controller: controller.phoneController,
-              ),
-              CustomTextField(
-                label: "Street Address",
-                controller: controller.streetController,
-              ),
-              CustomTextField(
-                label: "City*",
-                controller: controller.cityController,
-              ),
-              CustomTextField(
-                label: "State*",
-                controller: controller.stateController,
-              ),
-              CustomTextField(
-                label: "ZIP Code*",
-                controller: controller.zipController,
-              ),
-              CustomTextField(
-                label: "Country*",
-                controller: controller.countryController,
-              ),
-              CustomTextField(
-                label: "Company Registration Number",
-                controller: controller.registrationController,
-              ),
-              // TODO: Fetch from config/dynamic_content/categories
-              CustomTextField(
-                label: "Business Category*",
-                controller: controller.categoryController,
-              ),
-              CustomTextField(
-                label: "Business Type*",
-                controller: controller.businessTypeController,
+              Form(
+                key: formKey,
+                child: Column(
+                  children: [
+                    buildInputField(
+                      controller.fullNameController,
+                      "Full Name",
+                      isRequired: true,
+                    ),
+                    buildInputField(
+                      controller.nameController,
+                      "Business Name",
+                      isRequired: true,
+                    ),
+                    buildInputField(
+                      controller.emailController,
+                      "Email",
+                      isRequired: true,
+                      keyboardType: TextInputType.emailAddress,
+                    ),
+                    buildInputField(
+                      controller.phoneController,
+                      "Phone Number",
+                      isRequired: true,
+                      keyboardType: TextInputType.phone,
+                    ),
+                    buildInputField(
+                      controller.streetController,
+                      "Street Address",
+                    ),
+                    buildInputField(
+                      controller.cityController,
+                      "City",
+                      isRequired: true,
+                    ),
+                    buildInputField(
+                      controller.stateController,
+                      "State",
+                      isRequired: true,
+                    ),
+                    buildInputField(
+                      controller.zipController,
+                      "ZIP Code",
+                      isRequired: true,
+                    ),
+                    buildInputField(
+                      controller.countryController,
+                      "Country",
+                      isRequired: true,
+                    ),
+                    buildInputField(
+                      controller.registrationController,
+                      "Company Registration Number",
+                    ),
+                    buildInputField(
+                      controller.categoryController,
+                      "Business Category",
+                      isRequired: true,
+                    ),
+                    buildInputField(
+                      controller.businessTypeController,
+                      "Business Type",
+                      isRequired: true,
+                    ),
+                  ],
+                ),
               ),
 
               const SizedBox(height: 30),
-              PrimaryButton(
+              AsyncButton(
                 text: "Submit",
-                onPressed: () => controller.submitDetails(),
+                onPressedAsync: () async {
+                  if (formKey.currentState?.validate() == true) {
+                    await controller.submitDetails();
+                  }
+                },
               ),
               TextButton(
                 onPressed: () => {Get.toNamed(Routes.authMain)},

@@ -111,7 +111,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../components/Buttons.dart';
-import '../../../components/custom_text_field.dart';
+import '../../../components/input_fld.dart';
 import '../../../values/values.dart';
 import '../../controllers/auth/login_controller.dart';
 import '../../routes/app_routes.dart';
@@ -122,6 +122,7 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final textScale = MediaQuery.of(context).textScaleFactor;
+    final formKey = GlobalKey<FormState>();
 
     return Scaffold(
       backgroundColor: AppColor.pageColor,
@@ -153,24 +154,38 @@ class LoginScreen extends StatelessWidget {
                 const SizedBox(height: 40),
 
                 // Email & Password Fields
-                CustomTextField(
-                  label: "Email*",
-                  controller: controller.emailController,
-                ),
-                const SizedBox(height: 16),
-                CustomTextField(
-                  label: "Password*",
-                  controller: controller.passwordController,
-                  isPassword: true,
+                Form(
+                  key: formKey,
+                  child: Column(
+                    children: [
+                      buildInputField(
+                        controller.emailController,
+                        "Email",
+                        isRequired: true,
+                        keyboardType: TextInputType.emailAddress,
+                      ),
+                      buildInputField(
+                        controller.passwordController,
+                        "Password",
+                        isRequired: true,
+                        obscureText: true,
+                      ),
+                    ],
+                  ),
                 ),
 
                 const SizedBox(height: 30),
 
                 // Login Button
-                PrimaryButton(
-                  onPressed: () => {controller.login()},
-                  text: "Login",
-                ),
+                Obx(() => PrimaryButton(
+                      onPressed: () {
+                        if (formKey.currentState?.validate() == true) {
+                          controller.login();
+                        }
+                      },
+                      isLoading: controller.isLoading.value,
+                      text: "Login",
+                    )),
 
                 // Sign Up Link
                 const SizedBox(height: 10),

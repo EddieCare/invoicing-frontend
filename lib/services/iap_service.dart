@@ -93,7 +93,7 @@ class IAPService {
     _purchaseCompleter = Completer<bool>();
     await init();
 
-    // Subscriptions are non-consumable purchases with auto-renew in the store
+    // Subscriptions are non-consumable purchases with auto-renew in the stores
     await _iap.buyNonConsumable(purchaseParam: param);
     final result = await _purchaseCompleter!.future.timeout(
       const Duration(minutes: 5),
