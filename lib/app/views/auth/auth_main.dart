@@ -2,6 +2,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:lottie/lottie.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../../../values/values.dart';
 import '../../controllers/auth/auth_main_controller.dart';
@@ -71,6 +72,26 @@ class AuthMainScreen extends StatelessWidget {
                         const SizedBox(height: 30),
                         // AnimatedFeatureCarousel(),
                         const SizedBox(height: 40),
+                        Obx(() {
+                          if (!controller.appleSignInAvailable.value) {
+                            return const SizedBox.shrink();
+                          }
+                          return Column(
+                            children: [
+                              SizedBox(
+                                width: double.infinity,
+                                child: SignInWithAppleButton(
+                                  onPressed: controller.signInWithApple,
+                                  style: SignInWithAppleButtonStyle.black,
+                                  // cornerRadius: 8,
+                                  height: 48,
+                                  text: 'Sign in with Apple',
+                                ),
+                              ),
+                              const SizedBox(height: 20),
+                            ],
+                          );
+                        }),
                         SizedBox(
                           width: double.infinity,
                           child: ElevatedButton.icon(
