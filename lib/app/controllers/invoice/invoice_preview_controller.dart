@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:pdf/pdf.dart';
@@ -8,12 +9,76 @@ import 'package:printing/printing.dart';
 // import '../../../services/email_service.dart';
 
 class InvoicePreviewController extends GetxController {
-  late Map<String, dynamic> invoice;
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+
+  Map<String, dynamic> invoice = <String, dynamic>{};
+  bool isHydrating = false;
 
   @override
   void onInit() {
-    invoice = Get.arguments ?? {};
+    invoice = Map<String, dynamic>.from(Get.arguments ?? {});
     super.onInit();
+    _hydrateShopDetailsIfNeeded();
+  }
+
+  Future<void> _hydrateShopDetailsIfNeeded() async {
+    final needsShopData = [
+      'shop_name',
+      'shop_email',
+      'shop_phone',
+      'shop_address',
+      'shopLogo',
+      'shop_image_link',
+    ].any((key) {
+      final value = invoice[key];
+      if (value == null) return true;
+      if (value is String) return value.trim().isEmpty;
+      if (value is Map) return value.isEmpty;
+      return false;
+    });
+
+    if (!needsShopData) return;
+
+    final vendorEmail =
+        (invoice['vendor_email'] ?? FirebaseAuth.instance.currentUser?.email)
+            ?.toString()
+            .trim();
+    if (vendorEmail == null || vendorEmail.isEmpty) return;
+
+    try {
+      isHydrating = true;
+      update();
+
+      final snapshot =
+          await _db
+              .collection('vendors')
+              .doc(vendorEmail)
+              .collection('shops')
+              .limit(1)
+              .get();
+
+      if (snapshot.docs.isEmpty) return;
+
+      final data = snapshot.docs.first.data();
+      final merged = {
+        if (data['shop_name'] != null) 'shop_name': data['shop_name'],
+        if (data['shop_email'] != null) 'shop_email': data['shop_email'],
+        if (data['shop_phone'] != null) 'shop_phone': data['shop_phone'],
+        if (data['shop_address'] != null) 'shop_address': data['shop_address'],
+        if (data['shopLogo'] != null) 'shopLogo': data['shopLogo'],
+        if (data['shop_image_link'] != null)
+          'shop_image_link': data['shop_image_link'],
+      };
+
+      if (merged.isNotEmpty) {
+        invoice = {...invoice, ...merged};
+      }
+    } catch (_) {
+      // Ignore hydration failures; UI will fall back to placeholders.
+    } finally {
+      isHydrating = false;
+      update();
+    }
   }
 
   String formatDate(DateTime? date) {
@@ -23,8 +88,22 @@ class InvoicePreviewController extends GetxController {
 
   String formatDateFromTimestamp(dynamic timestamp) {
     if (timestamp == null) return 'N/A';
-    final date = (timestamp as Timestamp).toDate();
-    return DateFormat('MMMM d, yyyy').format(date);
+    if (timestamp is Timestamp) {
+      final date = timestamp.toDate();
+      return DateFormat('MMMM d, yyyy').format(date);
+    }
+    if (timestamp is DateTime) {
+      return DateFormat('MMMM d, yyyy').format(timestamp);
+    }
+    if (timestamp is String && timestamp.isNotEmpty) {
+      try {
+        final parsed = DateTime.tryParse(timestamp);
+        if (parsed != null) {
+          return DateFormat('MMMM d, yyyy').format(parsed);
+        }
+      } catch (_) {}
+    }
+    return 'N/A';
   }
 
   Future<void> sendInvoiceToClient() async {
@@ -35,7 +114,7 @@ class InvoicePreviewController extends GetxController {
       return;
     }
 
-    final pdf = _buildReceiptPdf();
+    final pdf = await _buildReceiptPdf();
     final bytes = await pdf.save();
 
     final status = (invoice['status'] ?? 'PENDING').toString().toUpperCase();
@@ -73,12 +152,12 @@ class InvoicePreviewController extends GetxController {
   }
 
   Future<void> downloadPdf() async {
-    final pdf = _buildReceiptPdf();
+    final pdf = await _buildReceiptPdf();
     await Printing.layoutPdf(onLayout: (format) async => pdf.save());
   }
 
   Future<void> sharePdf() async {
-    final pdf = _buildReceiptPdf();
+    final pdf = await _buildReceiptPdf();
     await Printing.sharePdf(
       bytes: await pdf.save(),
       filename:
@@ -88,7 +167,7 @@ class InvoicePreviewController extends GetxController {
     );
   }
 
-  pw.Document _buildReceiptPdf() {
+  Future<pw.Document> _buildReceiptPdf() async {
     final doc = pw.Document();
     // Scale up to A4 for better readability
     final pageFormat = PdfPageFormat.a4.applyMargin(
@@ -106,6 +185,72 @@ class InvoicePreviewController extends GetxController {
     final tax = (invoice['tax'] ?? 0).toDouble();
     final total = (invoice['total'] ?? 0).toDouble();
 
+    final shopLogoUrl =
+        (invoice['shopLogo'] ?? invoice['shop_image_link'] ?? '').toString();
+    pw.ImageProvider? shopLogo;
+    if (shopLogoUrl.isNotEmpty) {
+      try {
+        shopLogo = await networkImage(shopLogoUrl);
+      } catch (_) {}
+    }
+
+    pw.ImageProvider? brandLogo;
+    try {
+      brandLogo = await imageFromAssetBundle('assets/images/logo.png');
+    } catch (_) {}
+
+    final vendorEmail =
+        (invoice['shop_email'] ?? invoice['vendor_email'] ?? '-').toString();
+    final shopPhone = (invoice['shop_phone'] ?? '').toString();
+
+    String formatAddress(dynamic value) {
+      if (value is String) return value.isEmpty ? '-' : value;
+      if (value is Map) {
+        final parts =
+            [
+                  value['street'],
+                  value['city'],
+                  value['state'],
+                  value['zip'],
+                  value['country'],
+                ]
+                .map((e) => (e ?? '').toString().trim())
+                .where((element) => element.isNotEmpty)
+                .toList();
+        return parts.isEmpty ? '-' : parts.join(', ');
+      }
+      return '-';
+    }
+
+    pw.Widget logoBox(pw.ImageProvider? image, String fallbackText) {
+      return pw.Container(
+        width: 70,
+        height: 70,
+        decoration: pw.BoxDecoration(
+          color: PdfColors.grey200,
+          borderRadius: pw.BorderRadius.circular(16),
+          border: pw.Border.all(color: PdfColors.grey500, width: 0.2),
+        ),
+        child:
+            image != null
+                ? pw.ClipRRect(
+                  horizontalRadius: 16,
+                  verticalRadius: 16,
+                  child: pw.FittedBox(
+                    fit: pw.BoxFit.cover,
+                    child: pw.Image(image),
+                  ),
+                )
+                : pw.Center(
+                  child: pw.Text(
+                    fallbackText,
+                    style: const pw.TextStyle(fontSize: 8),
+                    textAlign: pw.TextAlign.center,
+                  ),
+                ),
+      );
+    }
+
     pw.Widget kv(String k, String v) => pw.Row(
       mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
       children: [pw.Text(k), pw.Text(v)],
@@ -118,67 +263,112 @@ class InvoicePreviewController extends GetxController {
           return pw.Column(
             crossAxisAlignment: pw.CrossAxisAlignment.start,
             children: [
-              pw.Center(
-                child: pw.Column(
-                  children: [
-                    pw.Text(
-                      'InvoiceDaily',
-                      style: pw.TextStyle(
-                        fontSize: 24,
-                        fontWeight: pw.FontWeight.bold,
+              pw.Row(
+                mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  logoBox(shopLogo, 'Shop Logo'),
+                  pw.Column(
+                    mainAxisSize: pw.MainAxisSize.min,
+                    children: [
+                      pw.Text(
+                        'InvoiceDaily',
+                        style: pw.TextStyle(
+                          fontSize: 22,
+                          fontWeight: pw.FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    pw.SizedBox(height: 4),
-                    pw.Text(
-                      'Official Invoice',
-                      style: const pw.TextStyle(fontSize: 12),
-                    ),
-                  ],
-                ),
+                      pw.SizedBox(height: 4),
+                      pw.Text(
+                        'Official Invoice',
+                        style: const pw.TextStyle(fontSize: 12),
+                      ),
+                    ],
+                  ),
+                  logoBox(brandLogo, 'InvoiceDaily'),
+                ],
               ),
               pw.SizedBox(height: 16),
               kv('Invoice #', (invoice['invoice_number'] ?? '-').toString()),
               kv('Issue Date', _fmtTs(invoice['issue_date'])),
               kv('Due Date', _fmtTs(invoice['due_date'])),
-              pw.Divider(),
-
-              pw.Text(
-                'Vendor',
-                style: pw.TextStyle(
-                  fontWeight: pw.FontWeight.bold,
-                  fontSize: 14,
+              pw.SizedBox(height: 12),
+              pw.Container(
+                width: double.infinity,
+                padding: const pw.EdgeInsets.all(12),
+                decoration: pw.BoxDecoration(
+                  color: PdfColors.grey200,
+                  borderRadius: pw.BorderRadius.circular(8),
+                ),
+                child: pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text(
+                      'Vendor',
+                      style: pw.TextStyle(
+                        fontWeight: pw.FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                    if (invoice['shop_name'] != null)
+                      pw.Text(
+                        invoice['shop_name'].toString(),
+                        style: const pw.TextStyle(fontSize: 12),
+                      ),
+                    if (invoice['shop_address'] != null)
+                      pw.Text(
+                        formatAddress(invoice['shop_address']),
+                        style: const pw.TextStyle(fontSize: 11),
+                      ),
+                    pw.SizedBox(height: 4),
+                    pw.Text(
+                      'Email: $vendorEmail',
+                      style: const pw.TextStyle(fontSize: 11),
+                    ),
+                    if (shopPhone.isNotEmpty)
+                      pw.Text(
+                        'Phone: $shopPhone',
+                        style: const pw.TextStyle(fontSize: 11),
+                      ),
+                  ],
                 ),
               ),
-              kv('Email', (invoice['vendor_email'] ?? '-').toString()),
-              if (invoice['shop_name'] != null)
-                kv('Shop', (invoice['shop_name']).toString()),
-              if (invoice['shop_address'] != null)
-                pw.Text(
-                  (invoice['shop_address']).toString(),
-                  style: const pw.TextStyle(fontSize: 12),
+              pw.SizedBox(height: 12),
+              pw.Container(
+                width: double.infinity,
+                padding: const pw.EdgeInsets.all(12),
+                decoration: pw.BoxDecoration(
+                  color: PdfColors.grey100,
+                  borderRadius: pw.BorderRadius.circular(8),
                 ),
-              pw.Divider(),
-
-              pw.Text(
-                'Bill To',
-                style: pw.TextStyle(
-                  fontWeight: pw.FontWeight.bold,
-                  fontSize: 14,
+                child: pw.Column(
+                  crossAxisAlignment: pw.CrossAxisAlignment.start,
+                  children: [
+                    pw.Text(
+                      'Bill To',
+                      style: pw.TextStyle(
+                        fontWeight: pw.FontWeight.bold,
+                        fontSize: 13,
+                      ),
+                    ),
+                    pw.Text(
+                      (client['name'] ?? '-').toString(),
+                      style: const pw.TextStyle(fontSize: 12),
+                    ),
+                    if (client['address'] != null)
+                      pw.Text(
+                        (client['address']).toString(),
+                        style: const pw.TextStyle(fontSize: 11),
+                      ),
+                    if (client['email'] != null)
+                      pw.Text(
+                        (client['email']).toString(),
+                        style: const pw.TextStyle(fontSize: 11),
+                      ),
+                  ],
                 ),
               ),
-              pw.Text((client['name'] ?? '-').toString()),
-              if (client['address'] != null)
-                pw.Text(
-                  (client['address']).toString(),
-                  style: const pw.TextStyle(fontSize: 12),
-                ),
-              if (client['email'] != null)
-                pw.Text(
-                  (client['email']).toString(),
-                  style: const pw.TextStyle(fontSize: 12),
-                ),
-              pw.Divider(),
-
+              pw.SizedBox(height: 18),
               pw.Text(
                 'Items',
                 style: pw.TextStyle(

@@ -32,6 +32,7 @@ class InvoiceController extends GetxController {
 
   String vendorId = ''; // Set this from the calling screen or auth
   String shopId = ''; // Set this from the calling screen
+  Map<String, dynamic>? shopDetails;
 
   PlanService planService = PlanService();
 
@@ -78,7 +79,9 @@ class InvoiceController extends GetxController {
 
       if (shopSnapshot.docs.isEmpty) return;
 
-      shopId = shopSnapshot.docs.first.id;
+      final shopDoc = shopSnapshot.docs.first;
+      shopId = shopDoc.id;
+      shopDetails = {...shopDoc.data(), 'id': shopDoc.id};
 
       final productsSnapshot =
           await _db
@@ -367,6 +370,21 @@ class InvoiceController extends GetxController {
       "status": "PENDING",
       "created_at": FieldValue.serverTimestamp(),
     };
+
+    invoiceData["vendor_email"] = vendorId;
+
+    if (shopDetails != null) {
+      final shop = shopDetails!;
+      final dynamic logo = shop['shopLogo'] ?? shop['shop_image_link'];
+      invoiceData.addAll({
+        if (logo != null && logo.toString().isNotEmpty)
+          "shopLogo": logo.toString(),
+        "shop_name": shop['shop_name'],
+        "shop_email": shop['shop_email'],
+        "shop_phone": shop['shop_phone'],
+        "shop_address": shop['shop_address'],
+      });
+    }
 
     await _db
         .collection('vendors')

@@ -607,6 +607,8 @@ class DashboardScreen extends StatelessWidget {
 
   Widget _buildShopCard(Map<String, dynamic> shopData, Size screenSize) {
     final address = (shopData['shop_address'] ?? {}) as Map<String, dynamic>;
+    final logoUrl =
+        (shopData['shopLogo'] ?? shopData['shop_image_link'] ?? '').toString();
     return GestureDetector(
       onTap: () => {Get.toNamed(Routes.shopDetailScreen, arguments: shopData)},
       child: Stack(
@@ -638,11 +640,19 @@ class DashboardScreen extends StatelessWidget {
                     width: screenSize.width * 0.22,
                     height: screenSize.width * 0.22,
                     color: Colors.white10,
-                    child: const Icon(
-                      Icons.storefront_rounded,
-                      color: Colors.white,
-                      size: 40,
-                    ),
+                    child:
+                        logoUrl.isNotEmpty
+                            ? Image.network(
+                              logoUrl,
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
+                            )
+                            : const Icon(
+                              Icons.storefront_rounded,
+                              color: Colors.white,
+                              size: 40,
+                            ),
                   ),
                 ),
                 const SizedBox(width: 14),

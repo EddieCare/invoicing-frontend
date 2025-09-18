@@ -166,6 +166,11 @@ class InvoiceDetailsScreen extends StatelessWidget {
   }
 
   Widget _invoiceHeaderCard() {
+    final logoUrl =
+        (controller.invoice['shopLogo'] ??
+                controller.invoice['shop_image_link'] ??
+                '')
+            .toString();
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -178,6 +183,23 @@ class InvoiceDetailsScreen extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Container(
+                width: 56,
+                height: 56,
+                decoration: BoxDecoration(
+                  color: Colors.white12,
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                clipBehavior: Clip.antiAlias,
+                child:
+                    logoUrl.isNotEmpty
+                        ? Image.network(logoUrl, fit: BoxFit.cover)
+                        : const Icon(
+                          Icons.storefront_outlined,
+                          color: Colors.white,
+                        ),
+              ),
+              const SizedBox(width: 16),
               // LEFT
               Expanded(
                 child: Column(

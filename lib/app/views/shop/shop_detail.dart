@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import '../../../components/dialogs.dart';
+
 import '../../../components/top_bar.dart';
 import '../../../values/values.dart';
+import '../../controllers/shop/shop_controller.dart';
+import 'shop_create.dart';
 
 class ShopDetailScreen extends StatelessWidget {
   final Map<String, dynamic> shopData;
@@ -11,154 +13,191 @@ class ShopDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<ShopController>();
+    final initialData = Map<String, dynamic>.from(shopData);
     return Scaffold(
       backgroundColor: AppColor.pageColor,
       appBar: TopBar(showBackButton: true, showAddInvoice: false),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              shopData['shop_name'] ?? 'Shop Name',
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: AppColor.textColorPrimary,
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              shopData['shop_category'] ?? '',
-              style: const TextStyle(
-                fontSize: 14,
-                color: AppColor.textColorSecondary,
-              ),
-            ),
-            const SizedBox(height: 24),
+      body: Obx(() {
+        final latest = controller.shopData.value;
+        final current =
+            latest != null ? {...initialData, ...latest} : initialData;
+        final logoUrl =
+            (current['shopLogo'] ?? current['shop_image_link'] ?? '')
+                .toString();
 
-            // Product Image
-            Center(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Image.network(
-                  'https://img.freepik.com/premium-vector/isolated-cartoon-vector-store-building-front-icon_1138841-28041.jpg',
-                  height: 200,
-                  width: MediaQuery.of(context).size.width * 0.9,
+        final address = current['shop_address'];
+        String street = '';
+        String cityLine = '';
+        String country = '';
+        if (address is Map) {
+          street = address['street']?.toString() ?? '';
+          final city = address['city']?.toString() ?? '';
+          final state = address['state']?.toString() ?? '';
+          final zip = address['zip']?.toString() ?? '';
+          cityLine =
+              [
+                city,
+                state,
+                zip,
+              ].where((element) => element.isNotEmpty).join(' ').trim();
+          country = address['country']?.toString() ?? '';
+        } else if (address is String) {
+          street = address;
+        }
 
-                  fit: BoxFit.cover,
+        return SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                current['shop_name'] ?? 'Shop Name',
+                style: const TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: AppColor.textColorPrimary,
                 ),
               ),
-            ),
-
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      shopData['shop_type'] ?? '',
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      shopData['shop_email'] ?? '',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        color: AppColor.textColorSecondary,
-                      ),
-                    ),
-                  ],
+              const SizedBox(height: 4),
+              Text(
+                current['shop_category'] ?? '',
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: AppColor.textColorSecondary,
                 ),
-                Text(
-                  shopData['isActive'] == true ? "Active" : "Inactive",
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.green,
-                    fontWeight: FontWeight.w600,
+              ),
+              const SizedBox(height: 24),
+              Center(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child:
+                      logoUrl.isNotEmpty
+                          ? Image.network(
+                            logoUrl,
+                            height: 200,
+                            width: MediaQuery.of(context).size.width * 0.9,
+                            fit: BoxFit.cover,
+                          )
+                          : Container(
+                            height: 200,
+                            width: MediaQuery.of(context).size.width * 0.9,
+                            color: Colors.black12,
+                            child: const Icon(
+                              Icons.store_mall_directory,
+                              size: 80,
+                              color: Colors.black45,
+                            ),
+                          ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        current['shop_type'] ?? '',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        current['shop_email'] ?? '',
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: AppColor.textColorSecondary,
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              'Shop Address',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color: AppColor.textColorPrimary,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              shopData['shop_address']?['street'] ?? '',
-              style: const TextStyle(
-                fontSize: 14,
-                color: AppColor.textColorSecondary,
-              ),
-            ),
-            Text(
-              "${shopData['shop_address']?['city'] ?? ''} ${shopData['shop_address']?['state'] ?? ''} ${shopData['shop_address']?['zip'] ?? ''}",
-              style: const TextStyle(
-                fontSize: 14,
-                color: AppColor.textColorSecondary,
-              ),
-            ),
-            Text(
-              shopData['shop_address']?['country'] ?? '',
-              style: const TextStyle(
-                fontSize: 14,
-                color: AppColor.textColorSecondary,
-              ),
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              'Contact',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-                color: AppColor.textColorPrimary,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              shopData['shop_phone'] ?? '',
-              style: const TextStyle(
-                fontSize: 14,
-                color: AppColor.textColorSecondary,
-              ),
-            ),
-            const SizedBox(height: 32),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                // Edit Button
-                ElevatedButton.icon(
-                  // onPressed: () => controller.editProduct(item),
-                  onPressed: () => {},
-                  icon: const Icon(Icons.edit, color: Colors.white),
-                  label: const Text('Edit'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.black,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 32,
-                      vertical: 16,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
+                  Text(
+                    current['isActive'] == true ? 'Active' : 'Inactive',
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: Colors.green,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
+                ],
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                'Shop Address',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: AppColor.textColorPrimary,
                 ),
-              ],
-            ),
-          ],
-        ),
-      ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                street,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: AppColor.textColorSecondary,
+                ),
+              ),
+              Text(
+                cityLine,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: AppColor.textColorSecondary,
+                ),
+              ),
+              Text(
+                country,
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: AppColor.textColorSecondary,
+                ),
+              ),
+              const SizedBox(height: 24),
+              const Text(
+                'Contact',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: AppColor.textColorPrimary,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                current['shop_phone'] ?? '',
+                style: const TextStyle(
+                  fontSize: 14,
+                  color: AppColor.textColorSecondary,
+                ),
+              ),
+              const SizedBox(height: 32),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () => showEditShopBottomSheet(context, current),
+                    icon: const Icon(Icons.edit, color: Colors.white),
+                    label: const Text('Edit'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 32,
+                        vertical: 16,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      }),
     );
   }
 }

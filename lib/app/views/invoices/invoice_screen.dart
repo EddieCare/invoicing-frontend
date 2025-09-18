@@ -204,6 +204,8 @@ class InvoiceCard extends StatelessWidget {
     final clientName = invoice['client']?['name'] ?? '';
     final total = (invoice['total'] ?? 0).toStringAsFixed(2);
     final status = (invoice['status'] ?? '').toString().toUpperCase();
+    final logoUrl =
+        (invoice['shopLogo'] ?? invoice['shop_image_link'] ?? '').toString();
 
     return GestureDetector(
       onTap: () => Get.toNamed(Routes.invoiceDetails, arguments: invoice),
@@ -221,14 +223,19 @@ class InvoiceCard extends StatelessWidget {
             width: 60,
             child: CircleAvatar(
               backgroundColor: Colors.black,
-              child: const Text(
-                "\$",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 24,
-                ),
-              ),
+              foregroundImage:
+                  logoUrl.isNotEmpty ? NetworkImage(logoUrl) : null,
+              child:
+                  logoUrl.isEmpty
+                      ? const Text(
+                        "\$",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 24,
+                        ),
+                      )
+                      : null,
             ),
           ),
           title: Text(

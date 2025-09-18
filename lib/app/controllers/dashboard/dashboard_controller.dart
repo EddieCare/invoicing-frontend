@@ -46,7 +46,8 @@ class DashboardController extends GetxController {
             .get();
 
     if (shopCollection.docs.isNotEmpty) {
-      shopData.value = shopCollection.docs.first.data();
+      final doc = shopCollection.docs.first;
+      shopData.value = {...doc.data(), 'id': doc.id};
       print("Shop data: --------------> ${shopData.value}");
     } else {
       shopData.value = null;
@@ -56,12 +57,13 @@ class DashboardController extends GetxController {
 
   Future<void> computeRemainingInvoices() async {
     if (email == null) return;
-    final shopSnapshot = await _firestore
-        .collection('vendors')
-        .doc(email)
-        .collection('shops')
-        .limit(1)
-        .get();
+    final shopSnapshot =
+        await _firestore
+            .collection('vendors')
+            .doc(email)
+            .collection('shops')
+            .limit(1)
+            .get();
     if (shopSnapshot.docs.isEmpty) return;
     final shopId = shopSnapshot.docs.first.id;
     final res = await _planService.checkPlanLimit(email!, shopId: shopId);
@@ -93,12 +95,13 @@ class DashboardController extends GetxController {
   Future<void> fetchDashboardAnalytics() async {
     if (email == null) return;
     try {
-      final shopSnapshot = await _firestore
-          .collection('vendors')
-          .doc(email)
-          .collection('shops')
-          .limit(1)
-          .get();
+      final shopSnapshot =
+          await _firestore
+              .collection('vendors')
+              .doc(email)
+              .collection('shops')
+              .limit(1)
+              .get();
       if (shopSnapshot.docs.isEmpty) {
         hasAnalytics.value = false;
         return;
@@ -124,29 +127,46 @@ class DashboardController extends GetxController {
       final from = DateTime(now.year, now.month, 1);
       final to = DateTime(now.year, now.month + 1, 1);
 
-      final snap = await invoicesRef
-          .where('issue_date', isGreaterThanOrEqualTo: Timestamp.fromDate(from))
-          .where('issue_date', isLessThan: Timestamp.fromDate(to))
-          .get();
+      final snap =
+          await invoicesRef
+              .where(
+                'issue_date',
+                isGreaterThanOrEqualTo: Timestamp.fromDate(from),
+              )
+              .where('issue_date', isLessThan: Timestamp.fromDate(to))
+              .get();
 
       Map<String, dynamic> computed = _computeFromSnapshot(snap);
       // Fallback to last 90 days if current month is empty
       if ((computed['totalInvoices'] ?? 0) == 0) {
         final from90 = now.subtract(const Duration(days: 90));
-        final snap90 = await invoicesRef
-            .where('issue_date', isGreaterThanOrEqualTo: Timestamp.fromDate(from90))
-            .where('issue_date', isLessThan: Timestamp.fromDate(now.add(const Duration(days: 1))))
-            .get();
+        final snap90 =
+            await invoicesRef
+                .where(
+                  'issue_date',
+                  isGreaterThanOrEqualTo: Timestamp.fromDate(from90),
+                )
+                .where(
+                  'issue_date',
+                  isLessThan: Timestamp.fromDate(
+                    now.add(const Duration(days: 1)),
+                  ),
+                )
+                .get();
         computed = _computeFromSnapshot(snap90);
       }
 
       // Compute month-over-month growth based on PAID revenue
       final prevFrom = DateTime(now.year, now.month - 1, 1);
       final prevTo = DateTime(now.year, now.month, 1);
-      final prevSnap = await invoicesRef
-          .where('issue_date', isGreaterThanOrEqualTo: Timestamp.fromDate(prevFrom))
-          .where('issue_date', isLessThan: Timestamp.fromDate(prevTo))
-          .get();
+      final prevSnap =
+          await invoicesRef
+              .where(
+                'issue_date',
+                isGreaterThanOrEqualTo: Timestamp.fromDate(prevFrom),
+              )
+              .where('issue_date', isLessThan: Timestamp.fromDate(prevTo))
+              .get();
       final prev = _computeFromSnapshot(prevSnap);
       final paidCurr = (computed['paidRevenue'] ?? 0.0) as double;
       final paidPrev = (prev['paidRevenue'] ?? 0.0) as double;
@@ -170,12 +190,13 @@ class DashboardController extends GetxController {
 
   Future<void> computeRemainingInvoicesV2() async {
     if (email == null) return;
-    final shopSnapshot = await _firestore
-        .collection('vendors')
-        .doc(email)
-        .collection('shops')
-        .limit(1)
-        .get();
+    final shopSnapshot =
+        await _firestore
+            .collection('vendors')
+            .doc(email)
+            .collection('shops')
+            .limit(1)
+            .get();
     if (shopSnapshot.docs.isEmpty) return;
     final shopId = shopSnapshot.docs.first.id;
 
@@ -200,17 +221,23 @@ class DashboardController extends GetxController {
     final now = DateTime.now();
     final from = DateTime(now.year, now.month, 1);
     final to = DateTime(now.year, now.month + 1, 1);
-    final snap = await ref
-        .where('issue_date', isGreaterThanOrEqualTo: Timestamp.fromDate(from))
-        .where('issue_date', isLessThan: Timestamp.fromDate(to))
-        .get();
+    final snap =
+        await ref
+            .where(
+              'issue_date',
+              isGreaterThanOrEqualTo: Timestamp.fromDate(from),
+            )
+            .where('issue_date', isLessThan: Timestamp.fromDate(to))
+            .get();
     final used = snap.size;
     usedInvoices.value = used;
     maxInvoices.value = limit;
     remainingInvoices.value = (limit - used).clamp(0, limit);
   }
 
-  Map<String, dynamic> _computeFromSnapshot(QuerySnapshot<Map<String, dynamic>> snap) {
+  Map<String, dynamic> _computeFromSnapshot(
+    QuerySnapshot<Map<String, dynamic>> snap,
+  ) {
     int totalInvoices = 0;
     int paidCount = 0;
     int pendingCount = 0;
@@ -240,7 +267,8 @@ class DashboardController extends GetxController {
       'totalRevenue': totalRevenue,
       'paidRevenue': paidRevenue,
       'pendingAmount': pendingAmount,
-      'avgInvoiceValue': totalInvoices == 0 ? 0.0 : totalRevenue / totalInvoices,
+      'avgInvoiceValue':
+          totalInvoices == 0 ? 0.0 : totalRevenue / totalInvoices,
     };
   }
 }
