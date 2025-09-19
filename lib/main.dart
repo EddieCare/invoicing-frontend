@@ -10,18 +10,21 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeFirebase();
 
-  Get.put(AuthController());
-
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
       initialRoute: Routes.splash,
       getPages: AppPages.pages,
+      initialBinding: BindingsBuilder(() {
+        Get.put<AuthController>(AuthController(), permanent: true);
+      }),
     );
   }
 }

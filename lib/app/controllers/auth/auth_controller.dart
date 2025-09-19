@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
@@ -18,10 +19,28 @@ class AuthController extends GetxController {
   }
 
   void _handleAuthChanged(User? user) {
-    if (user == null || !user.emailVerified) {
-      Get.offAllNamed(Routes.authMain); // Not logged in
+    void navigate() {
+      final currentUser = user;
+      final requiresEmailVerification = currentUser?.providerData
+              .any((element) => element.providerId == 'password') ??
+          false;
+
+      final bool isVerified = currentUser != null &&
+          (!requiresEmailVerification || currentUser.emailVerified);
+
+      final targetRoute = isVerified ? Routes.baseScreen : Routes.authMain;
+
+      if (Get.currentRoute == targetRoute) {
+        return;
+      }
+
+      Get.offAllNamed(targetRoute);
+    }
+
+    if (Get.context == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => navigate());
     } else {
-      Get.offAllNamed(Routes.baseScreen); // Logged in
+      navigate();
     }
   }
 
